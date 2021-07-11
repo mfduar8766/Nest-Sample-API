@@ -21,7 +21,7 @@ export class UserController {
 
   @Get('users:userId')
   async getUser(@Param('userId') userId) {
-    this.getUser(userId);
+    return this.getUser(userId);
   }
 
   @Post('users')
