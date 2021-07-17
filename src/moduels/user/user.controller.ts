@@ -30,7 +30,7 @@ export class UserController {
   }
 
   @Delete('users:userId')
-  async deletteUser(@Query() userId) {
+  async deletteUser(@Param('userId') userId) {
     return this.userService.deleteUser(userId);
   }
 }
