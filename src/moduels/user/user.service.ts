@@ -1,17 +1,20 @@
-import { Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  OnApplicationShutdown,
+  ShutdownSignal,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Users, UsersDocument } from '../../schemas/users.schema';
 import { UserModel } from './userModel';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnApplicationShutdown {
   constructor(
     @InjectModel(Users.name) private readonly userModel: Model<UsersDocument>,
+    @InjectConnection() private connection: Connection,
   ) {}
 
   async getUsers(): Promise<Users[]> {
@@ -60,5 +63,24 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
+  }
+
+  public async onApplicationShutdown(signal: string) {
+    if (signal == ShutdownSignal.SIGINT) {
+      this.log(signal);
+      try {
+        this.log('Closing db connection...');
+        await this.connection.close();
+        this.log('user.service connection closed.');
+      } catch (error) {
+        this.log(error);
+        throw new InternalServerErrorException(error);
+      }
+    }
+  }
+
+  private log(...message: any[]): void {
+    process.env.NODE_ENV === 'local' &&
+      console.log('user.service.ts: ', message.toString());
   }
 }

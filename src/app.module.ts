@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.development.local', 'env.development'],
+      envFilePath: ['.env.development.local', '.env.development'],
       isGlobal: true,
       cache: true,
     }),
@@ -21,7 +21,5 @@ import { ConfigModule } from '@nestjs/config';
     ),
     UsersModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
