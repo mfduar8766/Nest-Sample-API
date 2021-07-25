@@ -5,19 +5,26 @@ import {
   NotFoundException,
   OnApplicationShutdown,
   ShutdownSignal,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Users, UsersDocument } from '../../schemas/users.schema';
-import { UserModel } from './userModel';
+import { IUsers } from 'src/models/users.interface';
+import { MyLoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class UserService implements OnApplicationShutdown {
   constructor(
     @InjectModel(Users.name) private readonly userModel: Model<UsersDocument>,
     @InjectConnection() private connection: Connection,
-  ) {}
+    private logger: MyLoggerService,
+  ) {
+    this.logger.prefix = UserService.name;
+  }
 
   async getUsers(): Promise<Users[]> {
+    this.logger.log('getUsers()');
     try {
       const users = await this.userModel.find().exec();
       return users;
@@ -27,6 +34,8 @@ export class UserService implements OnApplicationShutdown {
   }
 
   async getUser(userId: string): Promise<Users> {
+    this.checkForUserId(userId);
+    this.logger.log('getUser()');
     try {
       const user = await this.userModel.findById({ _id: userId }).exec();
       if (!user) {
@@ -38,25 +47,46 @@ export class UserService implements OnApplicationShutdown {
     }
   }
 
-  async addUser(user: UserModel): Promise<Users> {
+  async addUser(user: IUsers): Promise<Users> {
+    this.logger.log('addUser()');
     try {
       const currentUser = await this.userModel
-        .findById({ _id: user.id })
+        .findById({ _id: user._id })
         .exec();
       if (currentUser) {
-        throw new NotFoundException(
-          new Error(`Could not create user: ${user.id} already exists`),
+        throw new HttpException(
+          `Cannot create user: ${user._id}. User already exists.`,
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
       const newUser = new this.userModel(user);
-      newUser.save();
-      return newUser;
+      return await newUser.save();
     } catch (error) {
       throw new InternalServerErrorException(error, 'Could not create user');
     }
   }
 
+  async updateUser(userId: string, user: IUsers) {
+    this.checkForUserId(user._id);
+    this.logger.log('updateUser()');
+    try {
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate({ _id: userId }, user)
+        .exec();
+      if (!updatedUser) {
+        throw new HttpException(
+          `Cannot update user: ${user._id}. User not found.`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return updatedUser;
+    } catch (error) {
+      throw new InternalServerErrorException(error, 'Could not update user.');
+    }
+  }
+
   async deleteUser(userId: string): Promise<Users> {
+    this.logger.log('deleteUser()');
     try {
       const deletedCustomer = await this.userModel.findByIdAndRemove(userId);
       return deletedCustomer;
@@ -67,20 +97,24 @@ export class UserService implements OnApplicationShutdown {
 
   public async onApplicationShutdown(signal: string) {
     if (signal == ShutdownSignal.SIGINT) {
-      this.log(signal);
+      this.logger.log('onApplicationShutdown Recevied Signal: ', signal);
       try {
-        this.log('Closing db connection...');
+        this.logger.log('onApplicationShutdown Closing db connection...');
         await this.connection.close();
-        this.log('user.service connection closed.');
+        this.logger.log('onApplicationShutdown Connection closed.');
       } catch (error) {
-        this.log(error);
+        this.logger.error(error);
         throw new InternalServerErrorException(error);
       }
     }
   }
 
-  private log(...message: any[]): void {
-    process.env.NODE_ENV === 'local' &&
-      console.log('user.service.ts: ', message.toString());
+  private checkForUserId(userId: string) {
+    if (!userId || userId === null || userId === undefined) {
+      throw new HttpException(
+        `Cannot update user at userId: ${userId}.`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 }
