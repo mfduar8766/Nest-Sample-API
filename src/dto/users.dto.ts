@@ -1,5 +1,7 @@
-export class UserModel {
-  readonly id: string;
+import { IUsers } from '../models/users.interface';
+
+export class UserModelDto implements IUsers {
+  readonly _id?: string;
   readonly firstName: string;
   readonly lastName: string;
   readonly email: string;

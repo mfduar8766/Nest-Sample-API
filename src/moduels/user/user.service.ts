@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Users, UsersDocument } from '../../schemas/users.schema';
-import { IUsers } from 'src/models/users.interface';
 import { MyLoggerService } from '../logger/logger.service';
+import { IUsers } from 'src/models/users.interface';
 
 @Injectable()
 export class UserService implements OnApplicationShutdown {
@@ -50,19 +50,13 @@ export class UserService implements OnApplicationShutdown {
   async addUser(user: IUsers): Promise<Users> {
     this.logger.log('addUser()');
     try {
-      const currentUser = await this.userModel
-        .findById({ _id: user._id })
-        .exec();
-      if (currentUser) {
-        throw new HttpException(
-          `Cannot create user: ${user._id}. User already exists.`,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
       const newUser = new this.userModel(user);
       return await newUser.save();
     } catch (error) {
-      throw new InternalServerErrorException(error, 'Could not create user');
+      throw new HttpException(
+        `Cannot create user: ${user}.`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -96,7 +90,7 @@ export class UserService implements OnApplicationShutdown {
   }
 
   public async onApplicationShutdown(signal: string) {
-    if (signal == ShutdownSignal.SIGINT) {
+    if (signal === ShutdownSignal.SIGINT || signal === ShutdownSignal.SIGTERM) {
       this.logger.log('onApplicationShutdown Recevied Signal: ', signal);
       try {
         this.logger.log('onApplicationShutdown Closing db connection...');
