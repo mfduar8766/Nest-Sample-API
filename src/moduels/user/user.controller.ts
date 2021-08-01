@@ -7,7 +7,9 @@ import {
   Delete,
   Put,
 } from '@nestjs/common';
+import { Roles } from 'src/decorators/roles.decorators';
 import { UserModelDto } from 'src/dto/users.dto';
+import { ApplicationRoles } from 'src/models/applicationRoles';
 import { IUsers } from 'src/models/users.interface';
 import { Users } from '../../schemas/users.schema';
 import { MyLoggerService } from '../logger/logger.service';
@@ -35,18 +37,21 @@ export class UserController {
   }
 
   @Post()
+  @Roles(ApplicationRoles.ADMIN)
   async addUser(@Body() user: UserModelDto): Promise<Users> {
     this.logger.log('addUser()');
     return this.userService.addUser(user);
   }
 
   @Put(':id')
+  @Roles(ApplicationRoles.ADMIN)
   async updateUser(@Param('id') id: string, @Body() user: UserModelDto) {
     this.logger.log('updateUser()');
     return this.userService.updateUser(id, user);
   }
 
   @Delete(':id')
+  @Roles(ApplicationRoles.ADMIN)
   async deletteUser(@Param('id') userId: string): Promise<IUsers> {
     this.logger.log('deletteUser()');
     return this.userService.deleteUser(userId);
