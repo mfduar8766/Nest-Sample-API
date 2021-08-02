@@ -54,7 +54,10 @@ export class UserService implements OnApplicationShutdown {
       return await newUser.save();
     } catch (error) {
       throw new HttpException(
-        `Cannot create user: ${user}.`,
+        {
+          message: `Cannot create user: ${user}.`,
+          error,
+        },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

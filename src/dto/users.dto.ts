@@ -1,3 +1,4 @@
+import { ApplicationRoles } from 'src/models/applicationRoles';
 import { IUsers } from '../models/users.interface';
 
 export class UserModelDto implements IUsers {
@@ -7,4 +8,5 @@ export class UserModelDto implements IUsers {
   readonly email: string;
   readonly password: string;
   readonly age: number;
+  readonly roles: ApplicationRoles[];
 }

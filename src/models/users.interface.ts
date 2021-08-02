@@ -1,3 +1,5 @@
+import { ApplicationRoles } from './applicationRoles';
+
 export interface IUsers {
   _id?: string;
   firstName: string;
@@ -5,4 +7,5 @@ export interface IUsers {
   email: string;
   age: number;
   password: string;
+  roles: ApplicationRoles[];
 }
