@@ -47,20 +47,49 @@ export class UserService implements OnApplicationShutdown {
     }
   }
 
-  async addUser(user: IUsers): Promise<Users> {
-    this.logger.log('addUser()');
+  async handleBulkInsert(users: IUsers[]): Promise<{
+    ok: number;
+    n: number;
+  }> {
+    this.logger.log('handleBulkInsert()');
     try {
-      const newUser = new this.userModel(user);
-      return await newUser.save();
+      const newUsersList = await this.userModel.collection.insertMany(users);
+      return newUsersList.result;
     } catch (error) {
       throw new HttpException(
         {
-          message: `Cannot create user: ${user}.`,
+          message: `Cannot create user: ${users.map(
+            (user: IUsers) => `${user.firstName} ${user.lastName}`,
+          )}.`,
           error,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async createUser(user: IUsers): Promise<Users> {
+    this.logger.log('createUser()');
+    if (user && user !== null && user !== undefined) {
+      try {
+        const newUser = new this.userModel(user);
+        return await newUser.save();
+      } catch (error) {
+        throw new HttpException(
+          {
+            message: `Cannot create user: ${user}.`,
+            error,
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+    throw new HttpException(
+      {
+        message: `Cannot create user`,
+      },
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   async updateUser(userId: string, user: IUsers) {
