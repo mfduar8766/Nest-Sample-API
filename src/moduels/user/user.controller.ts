@@ -1,12 +1,12 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Param,
   Body,
+  Controller,
   Delete,
-  Put,
+  Get,
   Headers,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/applicationRoles.decorators';
 import { UserModelDto } from 'src/dto/users.dto';
@@ -40,12 +40,12 @@ export class UserController {
   @Post()
   @Roles(ApplicationRoles.ADMIN, ApplicationRoles.SUPER_USER)
   async createUser(
-    @Headers('bulk-update') bulkUpdate: boolean,
+    @Headers('bulk-insert') bulkInsert: boolean,
     @Body() user: UserModelDto,
     @Body() users: UserModelDto[],
   ): Promise<any> {
     this.logger.log('createUser()');
-    if (bulkUpdate && users.length) {
+    if (bulkInsert && users.length) {
       return this.userService.handleBulkInsert(users);
     }
     return this.userService.createUser(user);
