@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { RolesGuard } from 'src/guards/roles.guard';
+import { RolesGuard } from 'src/guards/applicationRoles.guard';
 import { APP_GUARD } from 'src/models/constants';
 import { Users, UsersSchema } from 'src/schemas/users.schema';
 import { LoggerModule } from '../logger/loggger.module';

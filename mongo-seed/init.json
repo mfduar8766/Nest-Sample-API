@@ -1,0 +1,23 @@
+[
+  {
+    "roles": [
+      "ADMIN",
+      "SUPER_USER"
+    ],
+    "firstName": "John",
+    "lastName": "Doe",
+    "age": 29,
+    "email": "john@gmail.com",
+    "password": "testPassword21!"
+  },
+  {
+    "roles": [
+      "ADMIN"
+    ],
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "age": 29,
+    "email": "jane@gmail.com",
+    "password": "testIIPassword21!"
+  }
+]
