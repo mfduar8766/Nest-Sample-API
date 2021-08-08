@@ -18,6 +18,7 @@ services:
     links:
       - mongodb
   mongodb:
+    container_name: mongo_db
     image: mongo:latest
     restart: always
     ports:
@@ -25,6 +26,7 @@ services:
     volumes:
       - data-volume:/data/db
   mongo-seed:
+    command: npm run dropdb
     build: ./mongo-seed
     links:
       - mongodb
