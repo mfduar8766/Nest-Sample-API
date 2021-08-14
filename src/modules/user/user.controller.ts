@@ -74,10 +74,10 @@ export class UserController {
     @Headers('bulk-delete') bulkDelete: boolean,
     @Headers('id-list') idsToDelete: string[],
   ): Promise<any> {
+    this.logger.log('deletteUser()');
     if (bulkDelete && idsToDelete.length) {
       return this.userService.handleBulkDelete(idsToDelete);
     }
-    this.logger.log('deletteUser()');
     return this.userService.deleteUser(id);
   }
 }
