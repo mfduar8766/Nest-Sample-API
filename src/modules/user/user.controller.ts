@@ -5,13 +5,13 @@ import {
   Get,
   Headers,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/applicationRoles.decorators';
 import { UserModelDto } from 'src/dto/users.dto';
 import { ApplicationRoles } from 'src/models/applicationRoles';
-import { IUsers } from 'src/models/users.interface';
 import { Users } from '../../schemas/users.schema';
 import { MyLoggerService } from '../logger/logger.service';
 import { UserService } from './user.service';
@@ -32,9 +32,9 @@ export class UserController {
   }
 
   @Get(':id')
-  async getUser(@Param('id') userId: string): Promise<Users> {
+  async getUser(@Param('id') id: string): Promise<Users> {
     this.logger.log('getUser()');
-    return this.userService.getUser(userId);
+    return this.userService.getUser(id);
   }
 
   @Post()
@@ -58,10 +58,26 @@ export class UserController {
     return this.userService.updateUser(id, user);
   }
 
+  @Patch(':id/change-password')
+  async handleChangePassword(
+    @Param('id') id: string,
+    @Body() user: UserModelDto,
+  ) {
+    this.logger.log('handleChangePassword()');
+    this.userService.handleChangePassword(id, user);
+  }
+
   @Delete(':id')
   @Roles(ApplicationRoles.ADMIN, ApplicationRoles.SUPER_USER)
-  async deletteUser(@Param('id') userId: string): Promise<IUsers> {
+  async deletteUser(
+    @Param('id') id: string,
+    @Headers('bulk-delete') bulkDelete: boolean,
+    @Headers('id-list') idsToDelete: string[],
+  ): Promise<any> {
+    if (bulkDelete && idsToDelete.length) {
+      return this.userService.handleBulkDelete(idsToDelete);
+    }
     this.logger.log('deletteUser()');
-    return this.userService.deleteUser(userId);
+    return this.userService.deleteUser(id);
   }
 }

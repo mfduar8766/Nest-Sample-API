@@ -1,5 +1,5 @@
 FROM mongo:latest
 
-COPY init.json /init.json
+COPY initDb.json /initDb.json
 
-CMD mongoimport --host mongodb --db sample --collection users --type json --file /init.json --jsonArray
+CMD mongoimport --host mongodb --db sample --collection users --type json --file /initDb.json --jsonArray

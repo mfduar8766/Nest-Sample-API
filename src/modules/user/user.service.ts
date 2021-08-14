@@ -33,24 +33,21 @@ export class UserService implements OnApplicationShutdown {
     }
   }
 
-  async getUser(userId: string): Promise<Users> {
-    this.checkForUserId(userId);
+  async getUser(id: string): Promise<Users> {
+    this.checkForUserId(id);
     this.logger.log('getUser()');
     try {
-      const user = await this.userModel.findById({ _id: userId }).exec();
+      const user = await this.userModel.findById({ _id: id }).exec();
       if (!user) {
-        throw new NotFoundException(`User #${userId} not found`);
+        throw new NotFoundException(`User #${id} not found`);
       }
       return user;
     } catch (error) {
-      throw new InternalServerErrorException(`User #${userId} not found`);
+      throw new InternalServerErrorException(`User #${id} not found`);
     }
   }
 
-  async handleBulkInsert(users: IUsers[]): Promise<{
-    ok: number;
-    n: number;
-  }> {
+  async handleBulkInsert(users: IUsers[]) {
     this.logger.log('handleBulkInsert()');
     try {
       const newUsersList = await this.userModel.collection.insertMany(users);
@@ -58,9 +55,6 @@ export class UserService implements OnApplicationShutdown {
     } catch (error) {
       throw new HttpException(
         {
-          message: `Cannot create user: ${users.map(
-            (user: IUsers) => `${user.firstName} ${user.lastName}`,
-          )}.`,
           error,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -92,12 +86,12 @@ export class UserService implements OnApplicationShutdown {
     );
   }
 
-  async updateUser(userId: string, user: IUsers) {
+  async updateUser(id: string, user: IUsers) {
     this.checkForUserId(user._id);
     this.logger.log('updateUser()');
     try {
       const updatedUser = await this.userModel
-        .findByIdAndUpdate({ _id: userId }, user)
+        .findByIdAndUpdate({ _id: id }, user)
         .exec();
       if (!updatedUser) {
         throw new HttpException(
@@ -111,13 +105,46 @@ export class UserService implements OnApplicationShutdown {
     }
   }
 
-  async deleteUser(userId: string): Promise<Users> {
+  async deleteUser(id: string): Promise<Users> {
     this.logger.log('deleteUser()');
     try {
-      const deletedCustomer = await this.userModel.findByIdAndRemove(userId);
+      const deletedCustomer = await this.userModel.findByIdAndRemove(id);
       return deletedCustomer;
     } catch (error) {
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  async handleBulkDelete(idsToDelete: string[]) {
+    this.logger.log('handleBulkDelete()');
+    try {
+      const deleteIds = await this.userModel.collection.deleteMany({
+        _id: { $in: idsToDelete },
+      });
+      return deleteIds.result;
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: `Cannot delete ids: ${idsToDelete}.`,
+          error,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async handleChangePassword(id: string, user: IUsers) {
+    this.logger.log('handleChangePassword()');
+    this.logger.log('handleChangePassword user: ', user);
+    this.checkForUserId(id);
+  }
+
+  private checkForUserId(id: string) {
+    if (id === '' || id === null || id === undefined) {
+      throw new HttpException(
+        `Cannot update user at id: ${id}.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -132,15 +159,6 @@ export class UserService implements OnApplicationShutdown {
         this.logger.error(error);
         throw new InternalServerErrorException(error);
       }
-    }
-  }
-
-  private checkForUserId(userId: string) {
-    if (!userId || userId === null || userId === undefined) {
-      throw new HttpException(
-        `Cannot update user at userId: ${userId}.`,
-        HttpStatus.NOT_FOUND,
-      );
     }
   }
 }
