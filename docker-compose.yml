@@ -26,7 +26,6 @@ services:
     volumes:
       - data-volume:/data/db
   mongo-seed:
-    command: npm run dropdb
     build: ./mongo-seed
     links:
       - mongodb

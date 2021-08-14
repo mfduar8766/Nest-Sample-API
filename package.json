@@ -13,7 +13,7 @@
     "start:dev": "nest start --watch",
     "start:docker:detach": "docker-compose up -d",
     "start:docker": "docker-compose up",
-    "stop:docker": "docker-compose down",
+    "stop:docker": "docker-compose down -v",
     "dropdb": "docker exec -it mongo_db bash -c \"mongo sample --eval 'db.dropDatabase()'\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
