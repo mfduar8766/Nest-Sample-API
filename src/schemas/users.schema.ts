@@ -6,6 +6,9 @@ export type UsersDocument = Users & Document;
 
 @Schema()
 export class Users {
+  @Prop()
+  userName: string;
+
   @Prop({ required: true })
   firstName: string;
 
@@ -26,6 +29,15 @@ export class Users {
 
   @Prop({ required: true, default: ApplicationRoles.USER })
   roles: ApplicationRoles[];
+
+  @Prop({ required: true, default: Date.now() })
+  createdAt: Date;
+
+  @Prop({ default: null })
+  updatedAt: Date;
+
+  @Prop({ required: true, default: '' })
+  activationCode: string;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

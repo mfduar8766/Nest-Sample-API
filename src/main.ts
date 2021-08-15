@@ -1,7 +1,7 @@
 import { ShutdownSignal } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MyLoggerService } from './moduels/logger/logger.service';
+import { MyLoggerService } from './modules/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
