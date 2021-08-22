@@ -3,9 +3,7 @@ import { UserService } from './user.service';
 import { MyLoggerService } from '../logger/logger.service';
 import { Users, UsersDocument } from '../../schemas/users.schema';
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
-import {
-  LoggerMock,
-  usersListMockResults,
+import {LoggerMock,usersListMockResults,
   createdUserInstance,
   updatedUser,
   mockDbCalls,
@@ -92,6 +90,6 @@ describe('userService', () => {
     expect(deletedUser).toEqual(updatedUser);
   });
   it('should throw error if no userID present', () => {
-    expect(true).toEqual(false);
+    expect(true).toEqual(23);
   });
 });
