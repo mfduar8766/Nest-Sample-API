@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "prepare": "husky install",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -26,8 +27,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm test",
-      "pre-push": "npm format && npm lint"
+      "pre-commit": "npm run test",
+      "pre-push": "npm run format && npm run lint"
     }
   },
   "dependencies": {
