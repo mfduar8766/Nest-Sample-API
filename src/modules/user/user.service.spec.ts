@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { MyLoggerService } from '../logger/logger.service';
 import { Users, UsersDocument } from '../../schemas/users.schema';
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
-import {LoggerMock,usersListMockResults,
+import { LoggerMock, usersListMockResults,
   createdUserInstance,
   updatedUser,
   mockDbCalls,
