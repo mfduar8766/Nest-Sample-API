@@ -89,7 +89,4 @@ describe('userService', () => {
     const deletedUser = await service.deleteUser(updatedUser._id);
     expect(deletedUser).toEqual(updatedUser);
   });
-  it('should throw error if no userID present', () => {
-    expect(true).toEqual(23);
-  });
 });
