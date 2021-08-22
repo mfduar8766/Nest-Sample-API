@@ -18,7 +18,7 @@ import { UserModelDto } from 'src/dto/users.dto';
 export class UserService implements OnApplicationShutdown {
   constructor(
     @InjectModel(Users.name) private readonly userModel: Model<UsersDocument>,
-    @InjectConnection(Users.name) private connection: Connection,
+    @InjectConnection() private connection: Connection,
     private logger: MyLoggerService,
   ) {
     this.logger.prefix = UserService.name;

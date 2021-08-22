@@ -29,7 +29,7 @@ describe('userService', () => {
           useValue: mockDbCalls,
         },
         {
-          provide: getConnectionToken(Users.name),
+          provide: getConnectionToken(),
           useValue: mockDbCalls,
         },
       ],
