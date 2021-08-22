@@ -25,7 +25,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "husky": {
-    "pre-commit": "npm run format && npm run test",
+    "pre-commit": "format && test"
   },
   "dependencies": {
     "@nestjs/common": "^7.6.15",
