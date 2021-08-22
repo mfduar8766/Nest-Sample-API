@@ -6,6 +6,13 @@ import {
 } from '@nestjs/common';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
+/*
+  Create a new file if the date is a new date.
+  Fix the appendToFile func so that the data is appened to the file and displays in the log file.
+  If the app is stopped and restarted DONT create a new log file just use existing one and append to it.
+  Write unit tests.
+*/
+
 const checkIfFileOrDirectoryExists = (path: string): boolean => {
   return existsSync(path);
 };
@@ -13,11 +20,12 @@ const checkIfFileOrDirectoryExists = (path: string): boolean => {
 @Injectable({ scope: Scope.TRANSIENT })
 export class MyLoggerService implements LoggerService {
   private date = new Date();
-  private loggerPath = 'src/Logs';
+  private loggerPath = '';
   private fileName = '';
   private _prefix = '';
 
-  constructor() {
+  constructor(loggerPath: string) {
+    this.loggerPath = loggerPath;
     this.fileName = `${
       this.loggerPath
     }/${this.date.getFullYear()}-${this.setMonthPrefix()}-${this.date.getDate()}.log`;
