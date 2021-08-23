@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { RolesGuard } from 'src/guards/applicationRoles.guard';
-import { APP_GUARD } from 'src/models/constants';
-import { Users, UsersSchema } from 'src/schemas/users.schema';
-import { LoggerModule } from '../logger/loggger.module';
+import { RolesGuard } from '../../guards/applicationRoles.guard';
+import { APP_GUARD } from '../../models/constants';
+import { Users, UsersSchema } from '../../schemas/users.schema';
+import { MyLoggerService } from '../logger/logger.service';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
 @Module({
   imports: [
-    LoggerModule,
     MongooseModule.forFeature([{ name: Users.name, schema: UsersSchema }]),
   ],
   controllers: [UserController],
@@ -19,6 +18,7 @@ import { UserService } from './user.service';
       useClass: RolesGuard,
     },
     UserService,
+    MyLoggerService,
   ],
 })
 export class UsersModule {}

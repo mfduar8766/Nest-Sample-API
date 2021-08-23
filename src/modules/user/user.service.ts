@@ -11,7 +11,8 @@ import {
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Users, UsersDocument } from '../../schemas/users.schema';
 import { MyLoggerService } from '../logger/logger.service';
-import { IUsers } from 'src/models/users.interface';
+import { IUsers } from '../../models/users.interface';
+import { UserModelDto } from 'src/dto/users.dto';
 
 @Injectable()
 export class UserService implements OnApplicationShutdown {
@@ -47,7 +48,10 @@ export class UserService implements OnApplicationShutdown {
     }
   }
 
-  async handleBulkInsert(users: IUsers[]) {
+  async handleBulkInsert(users: IUsers[]): Promise<{
+    ok: number;
+    n: number;
+  }> {
     this.logger.log('handleBulkInsert()');
     try {
       const newUsersList = await this.userModel.collection.insertMany(users);
@@ -62,12 +66,12 @@ export class UserService implements OnApplicationShutdown {
     }
   }
 
-  async createUser(user: IUsers): Promise<Users> {
+  async createUser(user: UserModelDto): Promise<Users> {
     this.logger.log('createUser()');
+    console.log('USER: ', user);
     if (user && user !== null && user !== undefined) {
       try {
-        const newUser = new this.userModel(user);
-        return await newUser.save();
+        return await (await this.userModel.create(user)).save();
       } catch (error) {
         throw new HttpException(
           {
@@ -108,14 +112,17 @@ export class UserService implements OnApplicationShutdown {
   async deleteUser(id: string): Promise<Users> {
     this.logger.log('deleteUser()');
     try {
-      const deletedCustomer = await this.userModel.findByIdAndRemove(id);
+      const deletedCustomer = await this.userModel.findByIdAndRemove(id).exec();
       return deletedCustomer;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
 
-  async handleBulkDelete(idsToDelete: string[]) {
+  async handleBulkDelete(idsToDelete: string[]): Promise<{
+    ok?: number;
+    n?: number;
+  }> {
     this.logger.log('handleBulkDelete()');
     try {
       const deleteIds = await this.userModel.collection.deleteMany({
@@ -133,18 +140,16 @@ export class UserService implements OnApplicationShutdown {
     }
   }
 
-  async handleChangePassword(id: string, user: IUsers) {
+  handleChangePassword(id: string, user: IUsers): boolean {
     this.logger.log('handleChangePassword()');
     this.logger.log('handleChangePassword user: ', user);
     this.checkForUserId(id);
+    return true;
   }
 
   private checkForUserId(id: string) {
     if (id === '' || id === null || id === undefined) {
-      throw new HttpException(
-        `Cannot update user at id: ${id}.`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('User id does not exist.', HttpStatus.NOT_FOUND);
     }
   }
 
