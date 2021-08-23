@@ -1,10 +1,10 @@
 {
   "name": "test-app",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Sample NESTjs API to learn NEST and Docker",
+  "author": "Matheus Duarte",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prepare": "husky install",
     "prebuild": "rimraf dist",
@@ -72,12 +72,22 @@
     "typescript": "^4.2.3"
   },
   "jest": {
+    "coverageThreshold": {
+      "global": {
+        "statements": 50,
+        "functions": 50,
+        "lines": 50
+      }
+    },
     "moduleFileExtensions": [
       "js",
       "json",
       "ts"
     ],
-    "testPathIgnorePatterns": ["src/mocks", "src/dto", "src/schemas"],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/mocks/*",
+      "main.ts"
+    ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {

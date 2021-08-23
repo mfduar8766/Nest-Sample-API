@@ -22,7 +22,7 @@ const checkIfFileOrDirectoryExists = (path: string): boolean => {
 @Injectable({ scope: Scope.DEFAULT })
 export class MyLoggerService implements LoggerService {
   private date = new Date();
-  private loggerPath = 'src/Logger';
+  private loggerPath = 'src/Logs';
   private fileName = '';
   private _prefix = '';
 
