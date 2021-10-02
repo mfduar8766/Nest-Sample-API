@@ -18,22 +18,22 @@ import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
+  private serviceName = UserController.name;
+
   constructor(
     private readonly userService: UserService,
     private logger: MyLoggerService,
-  ) {
-    this.logger.prefix = UserController.name;
-  }
+  ) {}
 
   @Get()
   async getUsers(): Promise<Users[]> {
-    this.logger.log('getUsers()');
+    this.logger.log(`${this.serviceName} getUsers()`);
     return this.userService.getUsers();
   }
 
   @Get(':id')
   async getUser(@Param('id') id: string): Promise<Users> {
-    this.logger.log('getUser()');
+    this.logger.log(`${this.serviceName} getUser()`);
     return this.userService.getUser(id);
   }
 
@@ -44,7 +44,7 @@ export class UserController {
     @Body() user: UserModelDto,
     @Body() users: UserModelDto[],
   ): Promise<any> {
-    this.logger.log('createUser()');
+    this.logger.log(`${this.serviceName} createUser()`);
     if (bulkInsert && users.length) {
       return this.userService.handleBulkInsert(users);
     }
@@ -57,7 +57,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() user: UserModelDto,
   ): Promise<UsersDocument> {
-    this.logger.log('updateUser()');
+    this.logger.log(`${this.serviceName} updateUser()`);
     return this.userService.updateUser(id, user);
   }
 
@@ -66,7 +66,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() user: UserModelDto,
   ): boolean {
-    this.logger.log('handleChangePassword()');
+    this.logger.log(`${this.serviceName} handleChangePassword()`);
     return this.userService.handleChangePassword(id, user);
   }
 
@@ -77,7 +77,7 @@ export class UserController {
     @Headers('bulk-delete') bulkDelete: boolean,
     @Headers('id-list') idsToDelete: string[],
   ): Promise<any> {
-    this.logger.log('deleteUser()');
+    this.logger.log(`${this.serviceName} deleteUser()`);
     if (bulkDelete && idsToDelete.length) {
       return this.userService.handleBulkDelete(idsToDelete);
     }
