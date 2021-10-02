@@ -86,7 +86,8 @@
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/mocks/*",
-      "main.ts"
+      "<rootDir>/main.ts",
+      "mongo-seed"
     ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",

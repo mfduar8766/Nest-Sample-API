@@ -36,7 +36,7 @@ export class Users {
   @Prop({ default: null })
   updatedAt: Date;
 
-  @Prop({ required: true, default: '' })
+  @Prop({ default: '' })
   activationCode: string;
 }
 

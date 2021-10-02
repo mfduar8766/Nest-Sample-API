@@ -6,79 +6,48 @@ import {
 } from '@nestjs/common';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
-/*
-  Romulo:
-  Make the loggerPath configurable for testing the service.
-  Create a new file if the date is a new date.
-  Fix the appendToFile func so that the data is appened to the file and displays in the log file.
-  If the app is stopped and restarted DONT create a new log file just use existing one and append to it.
-  Write unit tests.
-*/
-
-const checkIfFileOrDirectoryExists = (path: string): boolean => {
-  return existsSync(path);
-};
-
 @Injectable({ scope: Scope.DEFAULT })
 export class MyLoggerService implements LoggerService {
   private date = new Date();
   private loggerPath = 'src/Logs';
   private fileName = '';
-  private _prefix = '';
+  private _serviceName = '';
+  private fullPath = '';
 
   constructor() {
-    this.fileName = `${
-      this.loggerPath
-    }/${this.date.getFullYear()}-${this.setMonthPrefix()}-${this.date.getDate()}.log`;
-    this.createLoggerDir(this.loggerPath, this.fileName);
+    this.fileName = this.setFileName();
+    this.fullPath = this.setFullPath();
+    this.createLoggerDir();
   }
 
   log(message: any, ...optionalParams: any[]) {
-    console.log(
-      this.createLogDate(),
-      `${this._prefix}`,
-      message,
-      optionalParams.toString(),
-    );
+    console.log(this.createLogDate(), message, optionalParams.toString());
     this.appendToFile(message, optionalParams);
   }
 
   error(message: any, ...optionalParams: any[]) {
-    console.error(
-      this.createLogDate(),
-      `${this._prefix}`,
-      message,
-      optionalParams.toString(),
-    );
+    console.error(this.createLogDate(), message, optionalParams.toString());
     this.appendToFile(message, optionalParams);
   }
 
   warn(message: any, ...optionalParams: any[]) {
-    console.warn(
-      this.createLogDate(),
-      `${this._prefix}`,
-      message,
-      optionalParams.toString(),
-    );
+    console.warn(this.createLogDate(), message, optionalParams.toString());
     this.appendToFile(message, optionalParams);
   }
 
   debug?(message: any, ...optionalParams: any[]) {
-    console.debug(
-      this.createLogDate(),
-      `${this.prefix}`,
-      message,
-      optionalParams.toString(),
-    );
+    console.debug(this.createLogDate(), message, optionalParams.toString());
     this.appendToFile(message, optionalParams);
   }
 
-  public set prefix(prefix: string) {
-    this._prefix = prefix;
+  public set serviceName(name: string) {
+    this._serviceName = name + ' ';
   }
 
   private createLogDate(): string {
-    return `${this.date.getFullYear()}:${this.setMonthPrefix()}:${this.date.getDate()}:${this.date.getHours()}:${this.date.getMinutes()}:${this.date.getSeconds()}:${this.date.getMilliseconds()}`;
+    return `${this.date.getFullYear()}:${this.setMonthPrefix()}:${this.date.getDate()}:${this.date.getHours()}:${this.date.getMinutes()}:${this.date.getSeconds()}:${this.date.getMilliseconds()} ${
+      this._serviceName
+    }`;
   }
 
   private setMonthPrefix(): string {
@@ -89,17 +58,46 @@ export class MyLoggerService implements LoggerService {
   }
 
   private appendToFile(message: any, ...optionalParams: any[]) {
+    if (this.checkIfFileOrDirectoryExists(this.fullPath)) {
+      try {
+        writeFileSync(
+          this.fullPath,
+          this.createLogDate() + message + optionalParams.toString() + '\n',
+          {
+            flag: 'a',
+            encoding: 'utf-8',
+          },
+        );
+      } catch (error) {
+        throw new InternalServerErrorException(
+          error,
+          'Error creating or writing to file',
+        );
+      }
+    }
+  }
+
+  private checkIfFileOrDirectoryExists(path: string): boolean {
+    return existsSync(path);
+  }
+
+  private createLogFile(fullPath: string, fileName: string): string {
+    const splitFileNameDay = fileName.split('-')[2].replace('.', '');
+    const day = parseInt(splitFileNameDay);
+    if (this.date.getDate() !== day) {
+      this.fileName = this.setFileName();
+      this.fullPath = this.setFullPath();
+      return this.fullPath;
+    }
+    return fullPath;
+  }
+
+  private callWriteFile() {
     try {
       writeFileSync(
-        this.fileName,
-        `${
-          (this.createLogDate(),
-          `${this._prefix}`,
-          message,
-          optionalParams.toString())
-        }\n`,
+        this.createLogFile(this.fullPath, this.fileName),
+        `${this.createLogDate()} Logger Started...\n`,
         {
-          flag: 'a',
           encoding: 'utf-8',
         },
       );
@@ -111,19 +109,23 @@ export class MyLoggerService implements LoggerService {
     }
   }
 
-  private createLoggerDir(loggerPath: string, fileName: string) {
-    if (!checkIfFileOrDirectoryExists(loggerPath)) {
-      mkdirSync(loggerPath);
+  private createLoggerDir() {
+    if (this.checkIfFileOrDirectoryExists(this.fullPath)) {
+      this.log('Restarting Nest Application...');
+      return;
+    } else if (!this.checkIfFileOrDirectoryExists(this.loggerPath)) {
+      mkdirSync(this.loggerPath);
+      this.callWriteFile();
+    } else if (this.checkIfFileOrDirectoryExists(this.loggerPath)) {
+      this.callWriteFile();
     }
-    try {
-      writeFileSync(fileName, `${this.createLogDate()} Logger Started\n`, {
-        encoding: 'utf-8',
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(
-        error,
-        'Error creating or writing to file',
-      );
-    }
+  }
+
+  private setFileName() {
+    return `${this.date.getFullYear()}-${this.setMonthPrefix()}-${this.date.getDate()}.log`;
+  }
+
+  private setFullPath() {
+    return this.loggerPath + '/' + this.fileName;
   }
 }

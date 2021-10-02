@@ -16,16 +16,16 @@ import { UserModelDto } from 'src/dto/users.dto';
 
 @Injectable()
 export class UserService implements OnApplicationShutdown {
+  private serviceName = UserService.name;
+
   constructor(
     @InjectModel(Users.name) private readonly userModel: Model<UsersDocument>,
     @InjectConnection() private connection: Connection,
     private logger: MyLoggerService,
-  ) {
-    this.logger.prefix = UserService.name;
-  }
+  ) {}
 
   async getUsers(): Promise<Users[]> {
-    this.logger.log('getUsers()');
+    this.logger.log(`${this.serviceName} getUsers()`);
     try {
       const users = await this.userModel.find().exec();
       return users;
@@ -36,7 +36,7 @@ export class UserService implements OnApplicationShutdown {
 
   async getUser(id: string): Promise<Users> {
     this.checkForUserId(id);
-    this.logger.log('getUser()');
+    this.logger.log(`${this.serviceName} getUser()`);
     try {
       const user = await this.userModel.findById({ _id: id }).exec();
       if (!user) {
@@ -52,7 +52,7 @@ export class UserService implements OnApplicationShutdown {
     ok: number;
     n: number;
   }> {
-    this.logger.log('handleBulkInsert()');
+    this.logger.log(`${this.serviceName} handleBulkInsert()`);
     try {
       const newUsersList = await this.userModel.collection.insertMany(users);
       return newUsersList.result;
@@ -67,8 +67,7 @@ export class UserService implements OnApplicationShutdown {
   }
 
   async createUser(user: UserModelDto): Promise<Users> {
-    this.logger.log('createUser()');
-    console.log('USER: ', user);
+    this.logger.log(`${this.serviceName} createUser()`);
     if (user && user !== null && user !== undefined) {
       try {
         return await (await this.userModel.create(user)).save();
@@ -92,7 +91,7 @@ export class UserService implements OnApplicationShutdown {
 
   async updateUser(id: string, user: IUsers) {
     this.checkForUserId(user._id);
-    this.logger.log('updateUser()');
+    this.logger.log(`${this.serviceName} updateUser()`);
     try {
       const updatedUser = await this.userModel
         .findByIdAndUpdate({ _id: id }, user)
@@ -110,7 +109,7 @@ export class UserService implements OnApplicationShutdown {
   }
 
   async deleteUser(id: string): Promise<Users> {
-    this.logger.log('deleteUser()');
+    this.logger.log(`${this.serviceName} deleteUser()`);
     try {
       const deletedCustomer = await this.userModel.findByIdAndRemove(id).exec();
       return deletedCustomer;
@@ -123,7 +122,7 @@ export class UserService implements OnApplicationShutdown {
     ok?: number;
     n?: number;
   }> {
-    this.logger.log('handleBulkDelete()');
+    this.logger.log(`${this.serviceName} handleBulkDelete()`);
     try {
       const deleteIds = await this.userModel.collection.deleteMany({
         _id: { $in: idsToDelete },
@@ -141,8 +140,8 @@ export class UserService implements OnApplicationShutdown {
   }
 
   handleChangePassword(id: string, user: IUsers): boolean {
-    this.logger.log('handleChangePassword()');
-    this.logger.log('handleChangePassword user: ', user);
+    this.logger.log(`${this.serviceName} handleChangePassword()`);
+    this.logger.log(`${this.serviceName} handleChangePassword User:`, user);
     this.checkForUserId(id);
     return true;
   }
@@ -155,7 +154,9 @@ export class UserService implements OnApplicationShutdown {
 
   public async onApplicationShutdown(signal: string) {
     if (signal === ShutdownSignal.SIGINT || signal === ShutdownSignal.SIGTERM) {
-      this.logger.log('onApplicationShutdown Recevied Signal: ', signal);
+      this.logger.log(
+        `${this.serviceName} onApplicationShutdown Recevied Signal: ${signal}`,
+      );
       try {
         this.logger.log('onApplicationShutdown Closing db connection...');
         await this.connection.close();
