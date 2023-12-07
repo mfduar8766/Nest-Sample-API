@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const fs = require('fs');
+const { fs } = require('fs');
 
 const removeFile = (path) => {
   try {
@@ -9,7 +9,7 @@ const removeFile = (path) => {
   }
 };
 
-(() => {
+(async () => {
   const dbFile = 'mongo-seed/initDb.json';
   const dbUsers = JSON.stringify(
     [
@@ -39,7 +39,7 @@ const removeFile = (path) => {
       },
     ],
     null,
-    4,
+    4
   );
   try {
     if (fs.existsSync(dbFile)) {
@@ -47,6 +47,9 @@ const removeFile = (path) => {
     }
     fs.writeFileSync(dbFile, dbUsers);
   } catch (error) {
-    console.error('Create DB users error: ', error);
+    console.error(
+      'Create DBName: sample with collection: users error: ',
+      error
+    );
   }
 })();

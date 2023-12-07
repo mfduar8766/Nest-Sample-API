@@ -1,0 +1,89 @@
+version: '3.4'
+
+services:
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - data-volume:/data/db
+    networks:
+      - node-network
+  cache:
+    container_name: cache
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+    networks:
+      - node-network
+  mongo-seed:
+    build:
+      context: ./mongo-seed
+      dockerfile: ./Dockerfile
+    depends_on:
+      - mongodb
+    links:
+      - 'mongodb'
+    networks:
+      - node-network
+  user:
+    container_name: app-user
+    image: app-user:0.0.1
+    build:
+      context: ./services/app-user
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start:dev
+    env_file:
+      - .env.development.local
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    volumes:
+      - ./:/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    working_dir: /usr/src/app
+    depends_on:
+      - mongodb
+    networks:
+      - node-network
+  client:
+    container_name: nestclient
+    image: nestclient:0.0.1
+    build:
+      context: ./services/nestClient
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start:dev
+    env_file:
+      - .env.development.local
+    ports:
+      - 4000:4000
+    expose:
+      - 4000
+    volumes:
+      - ./:/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    working_dir: /usr/src/app
+    depends_on:
+      - user
+    networks:
+      - node-network
+volumes:
+  cache:
+    driver: local
+  data-volume:
+    driver: local
+
+networks:
+  node-network:
+    driver: bridge

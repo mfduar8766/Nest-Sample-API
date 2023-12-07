@@ -1,0 +1,31 @@
+[
+    {
+        "roles": [
+            "ADMIN",
+            "SUPER_USER"
+        ],
+        "userName": "",
+        "firstName": "John",
+        "lastName": "Doe",
+        "age": 29,
+        "email": "john@gmail.com",
+        "password": "testPassword21!",
+        "createdAt": 1701559323287,
+        "updatedAt": null,
+        "activationCode": ""
+    },
+    {
+        "roles": [
+            "ADMIN"
+        ],
+        "userName": "",
+        "firstName": "Jane",
+        "lastName": "Doe",
+        "age": 29,
+        "email": "jane@gmail.com",
+        "password": "testIIPassword21!",
+        "createdAt": 1701559323287,
+        "updatedAt": null,
+        "activationCode": ""
+    }
+]
