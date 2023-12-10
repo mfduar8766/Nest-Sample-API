@@ -6,16 +6,15 @@ COPY package*.json ./
 
 RUN npm install glob rimraf
 
-RUN npm install --only=development
+RUN npm install
 
 COPY . .
 
-# Copy the .env and .env.development files
 COPY .env.development.* ./
 
 RUN npm run build
 
-EXPOSE 4000
+EXPOSE 3000
 
 CMD ["node", "dist/main"]
 
