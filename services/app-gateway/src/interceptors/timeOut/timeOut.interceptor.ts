@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable, throwError, TimeoutError } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
-import { ENV } from 'src/models/constants';
+import { ENV } from '../../../../common/models';
 import { MyLoggerService } from 'src/modules/logger/logger.service';
 
 @Injectable()

@@ -1,8 +1,8 @@
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModule } from './user/user.module';
-import { Module } from '@nestjs/common';
 import { ENV } from '../../common/models/constants';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [

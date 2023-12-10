@@ -13,3 +13,5 @@ sleep 10 &
 echo "Running docker-compose.yaml file and starting services..." &
 
 COMPOSE_HTTP_TIMEOUT=300 docker-compose up &
+
+@QueryParams for ?=

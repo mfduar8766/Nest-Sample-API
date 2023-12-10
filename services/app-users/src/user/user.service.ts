@@ -11,8 +11,8 @@ import { Connection, Model } from 'mongoose';
 import { MessagePayload } from '../../../common/dto/MessagePayload.dto';
 import {
   TMessagePayload,
-  USER_EVENTS,
   TUSER_EVENTS,
+  USER_EVENTS,
 } from '../../../common/events';
 import { Users, UsersDocument } from '../schemas/users.schema';
 

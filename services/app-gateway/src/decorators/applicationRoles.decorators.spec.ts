@@ -1,4 +1,4 @@
-import { ApplicationRoles } from '../models/applicationRoles';
+import { ApplicationRoles } from '../../../common/models';
 import { Roles } from './applicationRoles.decorators';
 
 describe('Roles', () => {
