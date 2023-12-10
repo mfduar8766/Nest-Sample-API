@@ -1,7 +1,7 @@
-import { ApplicationRoles } from 'src/models/applicationRoles';
-import { IUsers } from '../models/users.interface';
+import { ApplicationRoles } from '../models/applicationRoles';
+import { TUsers } from '../models/users.types';
 
-export class UserModelDto implements IUsers {
+export class UserModelDto implements TUsers {
   readonly _id?: string;
   readonly userName: string;
   readonly firstName: string;

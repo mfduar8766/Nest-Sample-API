@@ -17,19 +17,19 @@ import { MyLoggerService } from './modules/logger/logger.service';
   app.enableCors({
     origin: `http://${
       process.env.NODE_ENV === ENV.DEVELOPMENT ? process.env.HOST : 'localhost'
-    }:${process.env.NODE_ENV === ENV.DEVELOPMENT ? process.env.PORT : 4000}`,
+    }:${process.env.NODE_ENV === ENV.DEVELOPMENT ? process.env.PORT : 3000}`,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: process.env.ROLES.split(', ') || [
       'USER, ADMIN, SUPER_USER',
     ],
   });
 
-  process.on('uncaughtException', function (err) {
+  process.on('uncaughtException', function (err: any) {
     logger.error(HttpStatus.INTERNAL_SERVER_ERROR, err);
   });
 
   await app.listen(
-    process.env.NODE_ENV === ENV.DEVELOPMENT ? process.env.PORT : 4000,
+    process.env.NODE_ENV === ENV.DEVELOPMENT ? process.env.PORT : 3000,
     () =>
       logger.log(
         `nestjs-client listening on http://${
@@ -37,7 +37,7 @@ import { MyLoggerService } from './modules/logger/logger.service';
             ? process.env.HOST
             : 'localhost'
         }:${
-          process.env.NODE_ENV === ENV.DEVELOPMENT ? process.env.PORT : 4000
+          process.env.NODE_ENV === ENV.DEVELOPMENT ? process.env.PORT : 3000
         }`,
       ),
   );
