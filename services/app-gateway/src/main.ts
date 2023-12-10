@@ -3,7 +3,7 @@ import { HttpStatus } from '@nestjs/common/enums';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './filters/http.exception.filter';
-import { ENV } from './models/constants';
+import { ENV } from '../../common/models';
 import { MyLoggerService } from './modules/logger/logger.service';
 
 (async () => {

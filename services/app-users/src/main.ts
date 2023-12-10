@@ -1,8 +1,8 @@
 import { Logger, ShutdownSignal } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { AppModule } from './app.module';
 import { ENV } from '../../common/models/constants';
+import { AppModule } from './app.module';
 
 const logger = new Logger();
 

@@ -20,6 +20,14 @@ export class MyLoggerService implements LoggerService {
     this.createLoggerDir();
   }
 
+  public set serviceName(name: string) {
+    this._serviceName = name + ' ';
+  }
+
+  public get servicename(): string {
+    return this._serviceName;
+  }
+
   log(message: any, ...optionalParams: any[]) {
     console.log(this.createLogDate(), message, optionalParams.toString());
     this.appendToFile(message, optionalParams);
@@ -38,10 +46,6 @@ export class MyLoggerService implements LoggerService {
   debug?(message: any, ...optionalParams: any[]) {
     console.debug(this.createLogDate(), message, optionalParams.toString());
     this.appendToFile(message, optionalParams);
-  }
-
-  public set serviceName(name: string) {
-    this._serviceName = name + ' ';
   }
 
   private createLogDate(): string {
