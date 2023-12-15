@@ -2,6 +2,8 @@
 
 function addcommitpush () {
 
+echo "Adding and commiting files"
+
 current=$(git branch | grep "*" | cut -b 3-)
 
 message=\'"$@"\'
