@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RolesGuard } from '../../guards/applicationRoles.guard';
-import { APP_GUARD, ENV, USER_SERVICE } from '../../models/constants';
+import { APP_GUARD, ENV, USER_SERVICE } from '../../common/models/constants';
 import { MyLoggerService } from '../logger/logger.service';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';

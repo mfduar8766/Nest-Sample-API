@@ -25,7 +25,7 @@ services:
   mongo-seed:
     build:
       context: ./mongo-seed
-      dockerfile: ./Dockerfile
+      dockerfile: ./DockerFile
     depends_on:
       - mongodb
     links:

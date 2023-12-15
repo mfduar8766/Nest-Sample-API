@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { TMessagePayload, USER_EVENTS } from '../../../common/events';
+import { TMessagePayload, USER_EVENTS } from '../common/events';
 import { UserService } from './user.service';
 
 @Controller()
