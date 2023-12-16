@@ -10,7 +10,7 @@ message=\'"$@"\'
 git add --all :/ && git commit -a -m "$message"
 
 # feature/debug/refactor options for 1st part of branch name
-echo "What type of branch it is: 
+echo "What type of branch it is:
 f - feature
 d - debug
 r - refactor"
@@ -29,7 +29,7 @@ case $feature in
     *) #Invalid option
     echo "Invalid Option"
     feature=""
-    ;;    
+    ;;
 esac
 
 echo "Where to push?"

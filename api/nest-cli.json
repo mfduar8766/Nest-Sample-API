@@ -1,0 +1,39 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/app-gateway/src",
+  "monorepo": true,
+  "root": "apps/app-gateway",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/app-gateway/tsconfig.app.json"
+  },
+  "projects": {
+    "app-gateway": {
+      "type": "application",
+      "root": "apps/app-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/app-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/app-gateway/tsconfig.app.json"
+      }
+    },
+    "app-users": {
+      "type": "application",
+      "root": "apps/app-users",
+      "entryFile": "main",
+      "sourceRoot": "apps/app-users/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/app-users/tsconfig.app.json"
+      }
+    },
+    "shared-modules": {
+      "type": "library",
+      "root": "libs/shared-modules",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared-modules/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared-modules/tsconfig.lib.json"
+      }
+    }
+  }
+}
