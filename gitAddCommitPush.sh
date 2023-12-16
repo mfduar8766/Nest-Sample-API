@@ -28,6 +28,7 @@ case $feature in
     ;;
     *) #Invalid option
     echo "Invalid Option"
+    feature=""
     ;;    
 esac
 
