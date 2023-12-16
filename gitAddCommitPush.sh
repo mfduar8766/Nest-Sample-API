@@ -35,6 +35,8 @@ esac
 echo "Where to push?"
 read -i "$feature/$current" -e branch
 
+git checkout -b "$feature/$current"
+
 echo "You sure you wanna push? (y/n)"
 read -i "y" -e yn
 
