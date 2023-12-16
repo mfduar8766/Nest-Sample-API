@@ -18,13 +18,13 @@ r - refactor"
 read feature
 case $feature in
     f) #feature
-    feature="feature"
+    feature="FEATURE"
     ;;
     d) #debug
-    feature="debug"
+    feature="DEBUG"
      ;;
     r) #refactor
-    feature="refactor"
+    feature="REFACTOR"
     ;;
     *) #Invalid option
     echo "Invalid Option"
