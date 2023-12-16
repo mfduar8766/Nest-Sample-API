@@ -10,7 +10,7 @@ message=\'"$@"\'
 git add --all :/ && git commit -a -m "$message"
 
 echo "Where to push?"
-read -i "$current" -e branch
+read -i "feature\\$current" -e branch
 
 echo "You sure you wanna push? (y/n)"
 read -i "y" -e yn
