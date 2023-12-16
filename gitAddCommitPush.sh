@@ -19,25 +19,20 @@ read feature
 case $feature in
     f) #feature
     feature="feature"
-    echo "f was chosen"
     ;;
     d) #debug
     feature="debug"
-    echo "d was chosen"
-    ;;
+     ;;
     r) #refactor
     feature="refactor"
-    echo "r was chosen"
     ;;
     *) #Invalid option
     echo "Invalid Option"
     ;;    
 esac
 
-echo "value ${feature}"
-
 echo "Where to push?"
-read -i "$feature/\\$current" -e branch
+read -i "$feature/$current" -e branch
 
 echo "You sure you wanna push? (y/n)"
 read -i "y" -e yn
