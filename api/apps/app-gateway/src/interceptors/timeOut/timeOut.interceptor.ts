@@ -7,8 +7,13 @@ import {
 } from '@nestjs/common';
 import { Observable, throwError, TimeoutError } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
+<<<<<<< HEAD:api/apps/app-gateway/src/interceptors/timeOut/timeOut.interceptor.ts
 import { MyLoggerService } from '../../modules/logger/logger.service';
 import { ENV } from '@app/shared-modules';
+=======
+import { ENV } from '../../common/models';
+import { MyLoggerService } from 'src/modules/logger/logger.service';
+>>>>>>> 8112c2d71290c0c501d2f16a9dd5b865668014b5:services/app-gateway/src/interceptors/timeOut/timeOut.interceptor.ts
 
 @Injectable()
 export class TimeoutInterceptor implements NestInterceptor {

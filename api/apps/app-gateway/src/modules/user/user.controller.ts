@@ -8,6 +8,11 @@ import {
   Put,
 } from '@nestjs/common';
 import { Roles } from '../../decorators/applicationRoles.decorators';
+<<<<<<< HEAD:api/apps/app-gateway/src/modules/user/user.controller.ts
+=======
+import { UserModelDto } from '../../common/dto';
+import { ApplicationRoles } from '../../common/models';
+>>>>>>> 8112c2d71290c0c501d2f16a9dd5b865668014b5:services/app-gateway/src/modules/user/user.controller.ts
 import {
   Delete,
   Patch,

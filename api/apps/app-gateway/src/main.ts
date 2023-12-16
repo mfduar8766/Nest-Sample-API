@@ -3,6 +3,10 @@ import { HttpStatus } from '@nestjs/common/enums';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './filters/http.exception.filter';
+<<<<<<< HEAD:api/apps/app-gateway/src/main.ts
+=======
+import { ENV } from './common/models';
+>>>>>>> 8112c2d71290c0c501d2f16a9dd5b865668014b5:services/app-gateway/src/main.ts
 import { MyLoggerService } from './modules/logger/logger.service';
 import { ENV } from '@app/shared-modules';
 import { ConfigService } from '@nestjs/config';
