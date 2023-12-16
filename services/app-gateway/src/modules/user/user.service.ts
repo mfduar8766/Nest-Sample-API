@@ -2,10 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { USER_EVENTS } from '../../../../common/events';
-import { TMessagePayload, USER_SERVICE } from '../../../../common/models';
+import { USER_EVENTS } from '../../common/events';
+import { TMessagePayload, USER_SERVICE } from '../../common/models';
 import { MyLoggerService } from '../logger/logger.service';
-import { UserModelDto, MessagePayload } from '../../../../common/dto';
+import { UserModelDto, MessagePayload } from '../../common/dto';
 
 @Injectable()
 export class UserService {

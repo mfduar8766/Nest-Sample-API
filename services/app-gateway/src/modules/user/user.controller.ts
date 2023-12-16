@@ -8,8 +8,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { Roles } from '../../decorators/applicationRoles.decorators';
-import { UserModelDto } from '../../../../common/dto';
-import { ApplicationRoles } from '../../../../common/models';
+import { UserModelDto } from '../../common/dto';
+import { ApplicationRoles } from '../../common/models';
 import {
   Delete,
   Patch,

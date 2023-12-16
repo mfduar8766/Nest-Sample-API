@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-import { MessagePayload } from '../../../common/dto/MessagePayload.dto';
+import { MessagePayload } from '../common/dto/MessagePayload.dto';
 import {
   TMessagePayload,
   TUSER_EVENTS,
   USER_EVENTS,
-} from '../../../common/events';
+} from '../common/events';
 import { Users, UsersDocument } from '../schemas/users.schema';
 
 @Injectable()
