@@ -10,7 +10,7 @@ message=\'"$@"\'
 git add --all :/ && git commit -a -m "$message"
 
 # feature/debug/refactor options for 1st part of branch name
-echo "What type of branch it is:
+echo "Select branch type and enter a branch name:
 f - feature
 d - debug
 r - refactor"
