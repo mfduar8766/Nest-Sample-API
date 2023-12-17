@@ -2,14 +2,8 @@
 
 echo "CD into /services/app-gateway and npm install..." &
 
-cd services/app-gateway &
+cd api &
 
-npm install
+npm install --force &
 
-echo "CD into /services/app-user and npm install..." &
-
-cd ../app-user
-
-npm install &
-
-cd ../../
+cd ..

@@ -5,12 +5,12 @@ This is a microService repo for the purpose of learning how to properly create m
 # Folder Structure
 
 - Root
-  - mongo-seed: Used to pre populate mongoDB docker image with user data for testing
-  - services:
+  - api
+    - mongo-seed: Used to pre populate mongoDB docker image with user data for testing
     - app-user: Used to communicate with mongoDB to query for user info and send to app-gateway
     - app-gateway: Used as REST API that comminicates with all other services
     - common: Used as a shared folder for models and types
-  - docker-compose.yaml
+    - docker-compose.yaml
   - start.sh: Runs docker-compose.yaml and starts services
   - install.sh: Cds into services and runs npm install
   - gitAddCommitPush.sh: Used to git add --all:/. and git commit and git push origin <branch>
@@ -27,9 +27,9 @@ This is a microService repo for the purpose of learning how to properly create m
 
 - `docker ps`
 
-5. Create a .env.development.local in root, app-user, and app-gateway add the following content:
+5. Create a .env.development.local in api folder and add the following content:
 
-- `touch .env.development.local && cp .env.development.local services/app-gateway && cp .env.development.local services/app-user`
+- `cd api && touch .env.development.local`
 
 ### ENV:
 
@@ -37,7 +37,7 @@ NODE_ENV=development <br/>
 API_VERSION=v1 <br/>
 PORT=3000 <br/>
 HOST=localhost <br/>
-USER_SERVICE_HOST="app-user" <br/>
+USER_SERVICE_HOST="app-users" <br/>
 USER_SERVICE_PORT=8080 <br/>
 DB_COLLECTION=users <br/>
 DB_NAME=sample <br/>
