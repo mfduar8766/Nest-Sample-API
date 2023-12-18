@@ -6,6 +6,7 @@ import {
   TMessagePayload,
   USER_SERVICE,
   TUsers,
+  QUEUES,
 } from './models';
 import { USER_EVENTS } from './events';
 
@@ -19,4 +20,5 @@ export {
   MessagePayload,
   UserModelDto,
   USER_EVENTS,
+  QUEUES,
 };

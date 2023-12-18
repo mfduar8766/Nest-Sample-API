@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { MyLoggerService } from '../logger/logger.service';
 import {
@@ -10,17 +10,25 @@ import {
 } from '@app/shared-modules';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnApplicationBootstrap {
   private _name = UserService.name;
 
   constructor(
-    @Inject(USER_SERVICE) private readonly client: ClientProxy,
+    @Inject(USER_SERVICE) private readonly usersService: ClientProxy,
     private readonly logger: MyLoggerService,
   ) {}
 
+  async onApplicationBootstrap() {
+    try {
+      await this.usersService.connect();
+    } catch (error) {
+      throw new Error('Error connecting to usersService...');
+    }
+  }
+
   getUsers() {
     this.logger.log(`${this._name} getUsers()`);
-    return this.client.send<string, TMessagePayload>(
+    return this.usersService.send<string, TMessagePayload>(
       USER_EVENTS.get_users,
       new MessagePayload(USER_EVENTS.get_users, {}),
     );
@@ -28,7 +36,7 @@ export class UserService {
 
   getUser(id: string) {
     this.logger.log(`${this._name} getUsers()`);
-    return this.client.send<string, TMessagePayload>(
+    return this.usersService.send<string, TMessagePayload>(
       USER_EVENTS.get_user,
       new MessagePayload(USER_EVENTS.get_user, { _id: id }),
     );
@@ -36,7 +44,7 @@ export class UserService {
 
   createUser(user: UserModelDto) {
     this.logger.log(`${this._name} createUser()`);
-    return this.client.send<string, TMessagePayload>(
+    return this.usersService.send<string, TMessagePayload>(
       USER_EVENTS.add_user,
       new MessagePayload(USER_EVENTS.add_user, { user }),
     );
@@ -44,7 +52,7 @@ export class UserService {
 
   handleBulkInsert(users: UserModelDto[]) {
     this.logger.log(`${this._name} handleBulkInsert()`);
-    return this.client.send<string, TMessagePayload>(
+    return this.usersService.send<string, TMessagePayload>(
       USER_EVENTS.bulk_insert,
       new MessagePayload(USER_EVENTS.bulk_insert, { users }),
     );
@@ -52,7 +60,7 @@ export class UserService {
 
   updateUser(_id: string, user: UserModelDto) {
     this.logger.log(`${this._name} updateUser()`);
-    return this.client.send<string, TMessagePayload>(
+    return this.usersService.send<string, TMessagePayload>(
       USER_EVENTS.update_user,
       new MessagePayload(USER_EVENTS.update_user, { _id, user }),
     );
@@ -64,7 +72,7 @@ export class UserService {
 
   deleteUser(id: string) {
     this.logger.log(`${this._name} deleteUser()`);
-    return this.client.send<string, TMessagePayload>(
+    return this.usersService.send<string, TMessagePayload>(
       USER_EVENTS.delete_user,
       new MessagePayload(USER_EVENTS.delete_user, { id }),
     );
@@ -72,7 +80,7 @@ export class UserService {
 
   handleBulkDelete(idsToDelete: string[]) {
     this.logger.log(`${this._name} handleBulkDelete()`);
-    return this.client.send<string, TMessagePayload>(
+    return this.usersService.send<string, TMessagePayload>(
       USER_EVENTS.bulk_delete,
       new MessagePayload(USER_EVENTS.bulk_delete, { idsToDelete }),
     );

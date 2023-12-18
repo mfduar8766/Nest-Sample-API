@@ -1,23 +1,25 @@
 import { Module } from '@nestjs/common';
-import {
-  ClientOptions,
-  ClientProxyFactory,
-  Transport,
-} from '@nestjs/microservices';
+// import {
+//   ClientProxyFactory,
+//   MicroserviceOptions,
+//   Transport,
+// } from '@nestjs/microservices';
 import { RolesGuard } from '../../guards/applicationRoles.guard';
 import { MyLoggerService } from '../logger/logger.service';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { USER_SERVICE, APP_GUARD, ENV } from '@app/shared-modules';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD, SharedModules, QUEUES } from '@app/shared-modules';
+import { ConfigModule } from '@nestjs/config';
+import { SERVICES } from '@app/shared-modules/common/models';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['./.env.development.local'],
+      envFilePath: ['./.env.development.local', './rabbitmq-env.conf'],
       isGlobal: true,
       cache: true,
     }),
+    SharedModules.registerServices(SERVICES.USER_SERVICE, QUEUES.users_queue),
   ],
   controllers: [UserController],
   providers: [
@@ -25,29 +27,28 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    {
-      provide: USER_SERVICE,
-      useFactory: (configService: ConfigService) => {
-        const env = configService.get('NODE_ENV');
-        const host =
-          env === ENV.DEVELOPMENT
-            ? configService.get('USER_SERVICE_HOST')
-            : 'localhost';
-        const port =
-          env === ENV.DEVELOPMENT
-            ? configService.get('USER_SERVICE_PORT')
-            : 8080;
-        const options: ClientOptions = {
-          transport: Transport.TCP,
-          options: {
-            host,
-            port,
-          },
-        };
-        return ClientProxyFactory.create(options);
-      },
-      inject: [ConfigService],
-    },
+    // {
+    //   provide: USER_SERVICE,
+    //   useFactory: (configService: ConfigService) => {
+    //     const USERS_QUEUE = configService.get('USERS_QUEUE');
+    //     const USER = configService.get('USER');
+    //     const PASS = configService.get('PASS');
+    //     const HOST = configService.get('HOST');
+    //     const options: MicroserviceOptions = {
+    //       transport: Transport.RMQ,
+    //       options: {
+    //         urls: [`amqp://${USER}:${PASS}@${HOST}`],
+    //         queue: USERS_QUEUE,
+    //         noAck: false,
+    //         queueOptions: {
+    //           durable: true,
+    //         },
+    //       },
+    //     };
+    //     return ClientProxyFactory.create(options);
+    //   },
+    //   inject: [ConfigService],
+    // },
     UserService,
     MyLoggerService,
   ],
