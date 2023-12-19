@@ -1,6 +1,22 @@
 version: '3'
 
 services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.13-rc-management-alpine
+    hostname: rabbitmq
+    ports:
+      # RABBITMQ PORT
+      - 5672:5672
+        # RABBITMQ MANAGEMENT TOOL: localhost:15672
+      - 15672:15672
+    volumes:
+      - /var/lib/rabbitmq
+    env_file:
+      - rabbitmq-env.conf
+    networks:
+      - node-network
+
   mongodb:
     container_name: mongodb
     image: mongo:latest
@@ -11,6 +27,7 @@ services:
       - data-volume:/data/db
     networks:
       - node-network
+
   # cache:
   #   container_name: cache
   #   image: redis:latest
@@ -26,17 +43,17 @@ services:
   mongo-seed:
     build:
       context: ./mongo-seed
-      dockerfile: ./DockerFile
+      dockerfile: ./Dockerfile
     depends_on:
       - mongodb
     links:
-      - 'mongodb'
+      - mongodb
     networks:
       - node-network
 
   app-users:
-    container_name: app-user
-    image: app-user:0.0.1
+    container_name: app-users
+    image: app-users:0.0.1
     build:
       context: ./
       target: development
@@ -44,6 +61,7 @@ services:
     command: npm run start:dev app-users
     env_file:
       - .env.development.local
+      - rabbitmq-env.conf
     ports:
       - 8080:8080
     expose:
@@ -55,6 +73,7 @@ services:
     working_dir: /usr/src/app
     depends_on:
       - mongodb
+      - rabbitmq
     networks:
       - node-network
 
@@ -68,6 +87,7 @@ services:
     command: npm run start:dev app-gateway
     env_file:
       - .env.development.local
+      - rabbitmq-env.conf
     ports:
       - 3000:3000
     expose:
@@ -79,6 +99,7 @@ services:
     working_dir: /usr/src/app
     depends_on:
       - app-users
+      - rabbitmq
     networks:
       - node-network
 

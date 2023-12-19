@@ -35,10 +35,8 @@ This is a microService repo for the purpose of learning how to properly create m
 
 NODE_ENV=development <br/>
 API_VERSION=v1 <br/>
-PORT=3000 <br/>
+GATE_WAY_PORT=3000 <br/>
 HOST=localhost <br/>
-USER_SERVICE_HOST="app-users" <br/>
-USER_SERVICE_PORT=8080 <br/>
 DB_COLLECTION=users <br/>
 DB_NAME=sample <br/>
 ROLES="USER, ADMIN, SUPER_USER" <br/>
@@ -54,7 +52,7 @@ TIMEOUT=5000 <br/>
 
 8. Run `./install.sh` to install dependencies for app-user and app-gateway
 
-9. Run `./start.sh` to build the docker containers. This takes a while depending on your system. By default the start.sh script will run docker in attached mode so you will be able to see logs in console.
+9. cd api && run `./start.sh` to build the docker containers. This takes a while depending on your system. By default the start.sh script will run docker in attached mode so you will be able to see logs in console.
 
 # Making Requests
 

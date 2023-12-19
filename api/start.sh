@@ -12,4 +12,4 @@ sleep 10 &
 
 echo "Running docker-compose.yaml file and starting services..." &
 
-COMPOSE_HTTP_TIMEOUT=300 docker-compose up &
+COMPOSE_HTTP_TIMEOUT=500 docker-compose up &
