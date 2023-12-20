@@ -20,7 +20,9 @@ export class SharedModulesService {
     const USER = this.configService.get('USER');
     const PASS = this.configService.get('PASS');
     const HOST = this.configService.get('HOST');
-    console.log('FFFFFFFF', queue, QUEUES[queue]);
+    const maxConnectionAttempts = this.configService.get(
+      'MAX_RE_CONNECT_ATTEMPTS',
+    );
     const options: MicroserviceOptions = {
       transport: Transport.RMQ,
       options: {
@@ -29,6 +31,7 @@ export class SharedModulesService {
         noAck: false,
         queueOptions: {
           durable: true,
+          maxConnectionAttempts: Number(maxConnectionAttempts),
         },
       },
     };

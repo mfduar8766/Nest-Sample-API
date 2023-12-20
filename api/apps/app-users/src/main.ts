@@ -1,24 +1,40 @@
 import { NestFactory } from '@nestjs/core';
 import { AppUsersModule } from './app-users.module';
-import { MicroserviceOptions } from '@nestjs/microservices';
-import { QUEUES, SharedModulesService } from '@app/shared-modules';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { Logger, ShutdownSignal } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { QUEUES } from '@app/shared-modules';
 
 (async () => {
   const logger = new Logger();
   try {
-    const app = await NestFactory.create(AppUsersModule);
-    const configService = app.get(ConfigService);
-    const sharedService = app.get(SharedModulesService);
-    const USERS_QUEUE = configService.get('USERS_QUEUE') || QUEUES.users_queue;
-    app.connectMicroservice<MicroserviceOptions>(
-      sharedService.getConnectionOptions(USERS_QUEUE, 'app-users'),
+    const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+      AppUsersModule,
+      {
+        transport: Transport.RMQ,
+        options: {
+          urls: [`${process.env.RABBITMQ_URL}`],
+          queue: QUEUES.users_queue,
+          noAck: false,
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
     );
     app.enableShutdownHooks([ShutdownSignal.SIGINT, ShutdownSignal.SIGTERM]);
     app.useLogger(logger);
-    await app.startAllMicroservices();
+    await app.listen();
+    logger.log(
+      `Microservice: app-users getConnectionOptions(): is listening on: ${JSON.stringify(
+        {
+          url: `${process.env.RABBITMQ_URL}`,
+          queues: ['users_queue'],
+        },
+      )}`,
+    );
   } catch (error) {
-    logger.error(`Error starting app-users: ${error}`);
+    logger.error(
+      `app-users Error starting app-users: ${JSON.stringify(error)}`,
+    );
   }
 })();
