@@ -2,7 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppUsersController } from './app-users.controller';
 import { AppUsersService } from './app-users.service';
 import { ConfigModule } from '@nestjs/config';
-import { ENV, SharedModules } from '@app/shared-modules';
+import {
+  ENV,
+  LOGGER_SERVICE,
+  SharedLoggerModule,
+  SharedModules,
+} from '@app/shared-modules';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
@@ -25,6 +30,12 @@ import { MongooseModule } from '@nestjs/mongoose';
     SharedModules,
   ],
   controllers: [AppUsersController],
-  providers: [AppUsersService],
+  providers: [
+    AppUsersService,
+    {
+      provide: LOGGER_SERVICE,
+      useClass: SharedLoggerModule,
+    },
+  ],
 })
 export class AppUsersModule {}

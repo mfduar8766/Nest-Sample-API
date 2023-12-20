@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MyLoggerService } from './logger.service';
+import { SharedLoggerService } from './logger.service';
 
-describe('MyLoggerService', () => {
-  let service: MyLoggerService;
+describe('SharedLoggerService', () => {
+  let service: SharedLoggerService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MyLoggerService],
+      providers: [SharedLoggerService],
     }).compile();
 
-    service = module.get<MyLoggerService>(MyLoggerService);
+    service = module.get<SharedLoggerService>(SharedLoggerService);
   });
 
   it('should have a serviceName', () => {
@@ -18,22 +18,22 @@ describe('MyLoggerService', () => {
   });
   it('should log to console', () => {
     const consoleSpy = jest.spyOn(global.console, 'log');
-    service.log(`this is a message`);
+    service.logInfo({ message: `this is a message` });
     expect(consoleSpy).toHaveBeenCalled();
   });
   it('should error to console', () => {
     const consoleSpy = jest.spyOn(global.console, 'error');
-    service.error(`this is a message`);
+    service.logError({ message: `this is a message` });
     expect(consoleSpy).toHaveBeenCalled();
   });
   it('should warn to console', () => {
     const consoleSpy = jest.spyOn(global.console, 'warn');
-    service.warn(`this is a message`);
+    service.logWarn({ message: `this is a message` });
     expect(consoleSpy).toHaveBeenCalled();
   });
   it('should debug to console', () => {
     const consoleSpy = jest.spyOn(global.console, 'debug');
-    service.debug(`this is a message`);
+    service.logDebug({ message: `this is a message` });
     expect(consoleSpy).toHaveBeenCalled();
   });
   it('should setFullPath', () => {

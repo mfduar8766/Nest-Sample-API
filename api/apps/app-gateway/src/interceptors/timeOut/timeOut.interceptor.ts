@@ -4,15 +4,20 @@ import {
   ExecutionContext,
   CallHandler,
   RequestTimeoutException,
+  Inject,
 } from '@nestjs/common';
 import { Observable, throwError, TimeoutError } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
-import { MyLoggerService } from '../../modules/logger/logger.service';
-import { ENV } from '@app/shared-modules';
+import { ENV, LOGGER_SERVICE, SharedLoggerService } from '@app/shared-modules';
 
 @Injectable()
 export class TimeoutInterceptor implements NestInterceptor {
-  constructor(private logger: MyLoggerService) {}
+  constructor(
+    @Inject(LOGGER_SERVICE)
+    private readonly sharedLoggerService: SharedLoggerService,
+  ) {
+    this.sharedLoggerService.serviceName = TimeoutInterceptor.name;
+  }
 
   private name = TimeoutInterceptor.name;
 
@@ -25,10 +30,16 @@ export class TimeoutInterceptor implements NestInterceptor {
       ),
       catchError((err) => {
         if (err instanceof TimeoutError) {
-          this.logger.error(`${this.name}:timeOutError:${err.message}`);
+          this.sharedLoggerService.logError({
+            message: `${this.name}:timeOutError:${err.message}`,
+            method: 'catchError',
+          });
           return throwError(new RequestTimeoutException());
         } else {
-          this.logger.error(`${this.name}:error:${err.message}`);
+          this.sharedLoggerService.logError({
+            message: `${this.name}:timeOutError:${err.message}`,
+            method: 'catchError',
+          });
           return throwError(err);
         }
       }),

@@ -1,4 +1,11 @@
 import {
+  ApplicationRoles,
+  LOGGER_SERVICE,
+  USER_SERVICE,
+  UserModelDto,
+  SharedLoggerService,
+} from '@app/shared-modules';
+import {
   Body,
   Controller,
   Get,
@@ -10,7 +17,6 @@ import {
   Put,
   ShutdownSignal,
 } from '@nestjs/common';
-import { Roles } from '../../decorators/applicationRoles.decorators';
 import {
   Delete,
   Inject,
@@ -18,34 +24,34 @@ import {
   UseFilters,
   UseInterceptors,
 } from '@nestjs/common/decorators';
+import { ClientProxy } from '@nestjs/microservices';
+import { Roles } from '../../decorators/applicationRoles.decorators';
 import { HttpExceptionFilter } from '../../filters/http.exception.filter';
 import { TimeoutInterceptor } from '../../interceptors/timeOut/timeOut.interceptor';
-import { MyLoggerService } from '../logger/logger.service';
 import { UserService } from './user.service';
-import {
-  ApplicationRoles,
-  USER_SERVICE,
-  UserModelDto,
-} from '@app/shared-modules';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('users')
 export class UserController
   implements OnApplicationBootstrap, OnApplicationShutdown
 {
-  private _name = UserController.name;
   private _isConnected = false;
 
   constructor(
     private readonly userService: UserService,
-    private logger: MyLoggerService,
+    @Inject(LOGGER_SERVICE)
+    private readonly sharedLoggerService: SharedLoggerService,
     @Inject(USER_SERVICE) private readonly appUsersService: ClientProxy,
-  ) {}
+  ) {
+    this.sharedLoggerService.setLoggerFileName = UserController.name;
+  }
 
   async onApplicationBootstrap() {
     try {
-      const connected = await this.appUsersService.connect();
-      this.logger.log(`Connected to RabbitMQ`, JSON.stringify(connected));
+      await this.appUsersService.connect();
+      this.sharedLoggerService.logInfo({
+        message: `Connected to RabbitMQ`,
+        method: 'onApplicationBootstrap',
+      });
       this._isConnected = true;
     } catch (error) {
       throw new Error(
@@ -67,11 +73,18 @@ export class UserController
   @UseFilters(HttpExceptionFilter)
   @UseInterceptors(TimeoutInterceptor)
   async getUsers() {
-    this.logger.log(`${this._name} getUsers()`);
+    this.sharedLoggerService.logInfo({
+      message: 'Received request on getUsers()',
+      method: 'getUsers()',
+    });
     try {
       return this.userService.getUsers();
     } catch (error) {
-      this.logger.error(`${this._name}:getUsers():${JSON.stringify(error)}`);
+      this.sharedLoggerService.logError({
+        message: `Error on getUsers`,
+        method: 'getUsers()',
+        value: error,
+      });
       return error;
     }
   }
@@ -81,11 +94,18 @@ export class UserController
   @UseFilters(HttpExceptionFilter)
   @UseInterceptors(TimeoutInterceptor)
   async getUser(@Param('id') id: string) {
-    this.logger.log(`${this._name} getUser()`);
+    this.sharedLoggerService.logInfo({
+      message: 'Received request on getUser()',
+      method: 'getUser()',
+    });
     try {
       return this.userService.getUser(id);
     } catch (error) {
-      this.logger.error(`${this._name}:getUser():${JSON.stringify(error)}`);
+      this.sharedLoggerService.logError({
+        message: `Error on getUser`,
+        method: 'getUser()',
+        value: error,
+      });
     }
   }
 
@@ -98,20 +118,29 @@ export class UserController
     @Body() user: UserModelDto,
     @Body() users: UserModelDto[],
   ): Promise<any> {
-    this.logger.log(`${this._name} createUser()`);
+    this.sharedLoggerService.logInfo({
+      message: 'Received request on createUser()',
+      method: 'createUser()',
+    });
     if (bulkInsert && users.length) {
       try {
         return this.userService.handleBulkInsert(users);
       } catch (error) {
-        this.logger.error(
-          `${this._name}:createUser():${JSON.stringify(error)}`,
-        );
+        this.sharedLoggerService.logError({
+          message: `Error on handleBulkInsert`,
+          method: 'handleBulkInsert()',
+          value: error,
+        });
       }
     }
     try {
       return this.userService.createUser(user);
     } catch (error) {
-      this.logger.error(`${this._name}:createUser():${JSON.stringify(error)}`);
+      this.sharedLoggerService.logError({
+        message: `Error on createUser`,
+        method: 'createUser()',
+        value: error,
+      });
     }
   }
 
@@ -120,11 +149,18 @@ export class UserController
   @UseFilters(HttpExceptionFilter)
   @UseInterceptors(TimeoutInterceptor)
   async updateUser(@Param('id') id: string, @Body() user: UserModelDto) {
-    this.logger.log(`${this._name} updateUser()`);
+    this.sharedLoggerService.logInfo({
+      message: 'Received request on updateUser()',
+      method: 'updateUser()',
+    });
     try {
       return this.userService.updateUser(id, user);
     } catch (error) {
-      this.logger.error(`${this._name}:updateUser():${JSON.stringify(error)}`);
+      this.sharedLoggerService.logError({
+        message: `Error on updateUser`,
+        method: 'updateUser()',
+        value: error,
+      });
     }
   }
 
@@ -132,13 +168,18 @@ export class UserController
   @UseFilters(HttpExceptionFilter)
   @UseInterceptors(TimeoutInterceptor)
   handleChangePassword(@Param('id') id: string, @Body() user: UserModelDto) {
-    this.logger.log(`${this._name} handleChangePassword()`);
+    this.sharedLoggerService.logInfo({
+      message: 'Received request on handleChangePassword()',
+      method: 'handleChangePassword()',
+    });
     try {
       return this.userService.handleChangePassword(id, user);
     } catch (error) {
-      this.logger.error(
-        `${this._name}:handleChangePassword():${JSON.stringify(error)}`,
-      );
+      this.sharedLoggerService.logError({
+        message: `Error on handleChangePassword`,
+        method: 'handleChangePassword()',
+        value: error,
+      });
     }
   }
 
@@ -151,20 +192,29 @@ export class UserController
     @Headers('bulk-delete') bulkDelete: boolean,
     @Headers('id-list') idsToDelete: string[],
   ): Promise<any> {
-    this.logger.log(`${this._name} deleteUser()`);
+    this.sharedLoggerService.logInfo({
+      message: 'Received request on deleteUser()',
+      method: 'deleteUser()',
+    });
     if (bulkDelete && idsToDelete.length) {
       try {
         return this.userService.handleBulkDelete(idsToDelete);
       } catch (error) {
-        this.logger.error(
-          `${this._name}:handleBulkDelete():${JSON.stringify(error)}`,
-        );
+        this.sharedLoggerService.logError({
+          message: `Error on handleBulkDelete`,
+          method: 'handleBulkDelete()',
+          value: error,
+        });
       }
     }
     try {
       return this.userService.deleteUser(id);
     } catch (error) {
-      this.logger.error(`${this._name}:deleteUser():${JSON.stringify(error)}`);
+      this.sharedLoggerService.logError({
+        message: `Error on deleteUser`,
+        method: 'deleteUser()',
+        value: error,
+      });
     }
   }
 }

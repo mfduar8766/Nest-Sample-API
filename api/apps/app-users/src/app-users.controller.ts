@@ -1,24 +1,28 @@
-import { Controller } from '@nestjs/common';
-import { AppUsersService } from './app-users.service';
+import {
+  ApplicationRoles,
+  LOGGER_SERVICE,
+  SharedModulesService,
+  TMessagePayload,
+  USER_EVENTS,
+  UserModelDto,
+} from '@app/shared-modules';
+import { SharedLoggerService } from '@app/shared-modules/modules/logger/logger.service';
+import { Controller, Inject } from '@nestjs/common';
 import {
   Ctx,
   MessagePattern,
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import {
-  ApplicationRoles,
-  SharedModulesService,
-  TMessagePayload,
-  USER_EVENTS,
-  UserModelDto,
-} from '@app/shared-modules';
+import { AppUsersService } from './app-users.service';
 
 @Controller()
 export class AppUsersController {
   constructor(
     private readonly appUsersService: AppUsersService,
     private readonly shareServices: SharedModulesService,
+    @Inject(LOGGER_SERVICE)
+    private readonly logger: SharedLoggerService,
   ) {}
 
   @MessagePattern(USER_EVENTS.get_users)
@@ -26,7 +30,11 @@ export class AppUsersController {
     @Payload() payload: TMessagePayload,
     @Ctx() context: RmqContext,
   ) {
-    console.log(`getUsers(): received payload:${JSON.stringify(payload)}`);
+    this.logger.logInfo({
+      message: `Received event: ${payload.event}`,
+      method: 'getUsers()',
+      value: payload,
+    });
     this.shareServices.handleContextAcknowledgement(context);
     return [
       new UserModelDto(

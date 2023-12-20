@@ -4,9 +4,9 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install glob rimraf --force
+RUN npm install glob rimraf
 
-RUN npm install --force
+RUN npm install
 
 COPY . .
 

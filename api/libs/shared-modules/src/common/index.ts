@@ -7,6 +7,7 @@ import {
   USER_SERVICE,
   TUsers,
   QUEUES,
+  LOGGER_SERVICE,
 } from './models';
 import { USER_EVENTS } from './events';
 
@@ -21,4 +22,5 @@ export {
   UserModelDto,
   USER_EVENTS,
   QUEUES,
+  LOGGER_SERVICE,
 };
