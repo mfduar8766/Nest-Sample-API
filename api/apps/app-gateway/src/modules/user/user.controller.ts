@@ -3,13 +3,17 @@ import {
   Controller,
   Get,
   Headers,
+  OnApplicationBootstrap,
+  OnApplicationShutdown,
   Param,
   Post,
   Put,
+  ShutdownSignal,
 } from '@nestjs/common';
 import { Roles } from '../../decorators/applicationRoles.decorators';
 import {
   Delete,
+  Inject,
   Patch,
   UseFilters,
   UseInterceptors,
@@ -18,16 +22,46 @@ import { HttpExceptionFilter } from '../../filters/http.exception.filter';
 import { TimeoutInterceptor } from '../../interceptors/timeOut/timeOut.interceptor';
 import { MyLoggerService } from '../logger/logger.service';
 import { UserService } from './user.service';
-import { ApplicationRoles, UserModelDto } from '@app/shared-modules';
+import {
+  ApplicationRoles,
+  USER_SERVICE,
+  UserModelDto,
+} from '@app/shared-modules';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('users')
-export class UserController {
+export class UserController
+  implements OnApplicationBootstrap, OnApplicationShutdown
+{
   private _name = UserController.name;
+  private _isConnected = false;
 
   constructor(
     private readonly userService: UserService,
     private logger: MyLoggerService,
+    @Inject(USER_SERVICE) private readonly appUsersService: ClientProxy,
   ) {}
+
+  async onApplicationBootstrap() {
+    try {
+      const connected = await this.appUsersService.connect();
+      this.logger.log(`Connected to RabbitMQ`, JSON.stringify(connected));
+      this._isConnected = true;
+    } catch (error) {
+      throw new Error(
+        `Error connecting to app-users:${JSON.stringify(error)}...`,
+      );
+    }
+  }
+
+  onApplicationShutdown(signal?: string) {
+    if (signal === ShutdownSignal.SIGTERM || signal === ShutdownSignal.SIGINT) {
+      if (this._isConnected) {
+        this.appUsersService.close();
+        this._isConnected = false;
+      }
+    }
+  }
 
   @Get()
   @UseFilters(HttpExceptionFilter)

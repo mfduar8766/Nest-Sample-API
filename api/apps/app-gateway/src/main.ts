@@ -20,10 +20,10 @@ import { ConfigService } from '@nestjs/config';
     const port =
       env === ENV.DEVELOPMENT ? configService.get('GATE_WAY_PORT') : 3000;
     logger.serviceName = 'nestjs-client';
-    app.useLogger(logger);
     app.enableShutdownHooks([ShutdownSignal.SIGINT, ShutdownSignal.SIGTERM]);
     app.setGlobalPrefix(`api/${process.env.API_VERSION}`);
     app.useGlobalFilters(new HttpExceptionFilter());
+    app.useLogger(logger);
     app.enableCors({
       origin: `http://${env === ENV.DEVELOPMENT ? host : 'localhost'}:${
         env === ENV.DEVELOPMENT ? port : 3000
@@ -35,7 +35,10 @@ import { ConfigService } from '@nestjs/config';
     });
 
     process.on('uncaughtException', function (err: any) {
-      logger.error(`app-gateway ${HttpStatus.INTERNAL_SERVER_ERROR}`, err);
+      logger.error(
+        `app-gateway uncaughtException ${HttpStatus.INTERNAL_SERVER_ERROR}`,
+        err,
+      );
     });
 
     await app.listen(env === ENV.DEVELOPMENT ? port : 3000, () =>

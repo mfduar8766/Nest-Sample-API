@@ -7,6 +7,10 @@ export type TMessagePayload = {
   error?: any;
 };
 
+export enum EVENTS {
+  PING = 'ping',
+}
+
 export enum USER_EVENTS {
   get_user = 'get_user',
   get_users = 'get_users',

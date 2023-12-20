@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { MyLoggerService } from '../logger/logger.service';
 import {
@@ -10,21 +10,13 @@ import {
 } from '@app/shared-modules';
 
 @Injectable()
-export class UserService implements OnApplicationBootstrap {
+export class UserService {
   private _name = UserService.name;
 
   constructor(
     @Inject(USER_SERVICE) private readonly usersService: ClientProxy,
     private readonly logger: MyLoggerService,
   ) {}
-
-  async onApplicationBootstrap() {
-    try {
-      await this.usersService.connect();
-    } catch (error) {
-      throw new Error('Error connecting to usersService...');
-    }
-  }
 
   getUsers() {
     this.logger.log(`${this._name} getUsers()`);

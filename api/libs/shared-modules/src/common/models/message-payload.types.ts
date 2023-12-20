@@ -8,8 +8,19 @@ export type TUserMessagePayloadParams = {
   idsToDelete?: string[];
 };
 
+export type TResponsePayloadResult =
+  | 'success'
+  | 'internalServerError'
+  | 'notFound'
+  | 'ResourceInUse';
+
+export type TResponsePayloadParams = {
+  result: TResponsePayloadResult;
+  data: Record<string, any>;
+};
+
 export type TMessagePayload = {
   event: string;
   params?: TUserMessagePayloadParams;
-  response?: Record<string, any>;
+  response?: TResponsePayloadParams;
 };

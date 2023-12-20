@@ -8,6 +8,7 @@ import {
 } from '@nestjs/microservices';
 import {
   ApplicationRoles,
+  SharedModulesService,
   TMessagePayload,
   USER_EVENTS,
   UserModelDto,
@@ -15,22 +16,18 @@ import {
 
 @Controller()
 export class AppUsersController {
-  constructor(private readonly appUsersService: AppUsersService) {}
+  constructor(
+    private readonly appUsersService: AppUsersService,
+    private readonly shareServices: SharedModulesService,
+  ) {}
 
   @MessagePattern(USER_EVENTS.get_users)
   async getUsers(
     @Payload() payload: TMessagePayload,
     @Ctx() context: RmqContext,
   ) {
-    const channel = context.getChannelRef();
-    const message = context.getMessage();
-    channel.ack(message);
-    console.log(
-      `Received Request:${JSON.stringify({
-        message,
-        payload,
-      })}`,
-    );
+    console.log(`getUsers(): received payload:${JSON.stringify(payload)}`);
+    this.shareServices.handleContextAcknowledgement(context);
     return [
       new UserModelDto(
         'bob22',
