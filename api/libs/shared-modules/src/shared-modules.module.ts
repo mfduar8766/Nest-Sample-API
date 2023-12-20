@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { SharedModulesService } from './shared-modules.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
@@ -20,7 +20,7 @@ import {
 })
 export class SharedModules {
   static registerServices(service: string, queue: string): DynamicModule {
-    const providers = [
+    const providers: Provider[] = [
       {
         provide: service,
         useFactory: (configService: ConfigService) => {

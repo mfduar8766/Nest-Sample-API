@@ -6,6 +6,7 @@ import {
   QUEUES,
   SERVICES,
   TQueueNames,
+  LOGGER_SERVICE,
 } from './constants';
 import { TMessagePayload } from './message-payload.types';
 import { TUsers } from './users.types';
@@ -20,4 +21,5 @@ export {
   QUEUES,
   SERVICES,
   TQueueNames,
+  LOGGER_SERVICE,
 };

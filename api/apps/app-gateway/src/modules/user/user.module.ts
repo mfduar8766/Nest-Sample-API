@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
 import { RolesGuard } from '../../guards/applicationRoles.guard';
-import { MyLoggerService } from '../logger/logger.service';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { APP_GUARD, SharedModules, QUEUES } from '@app/shared-modules';
+import {
+  APP_GUARD,
+  LOGGER_SERVICE,
+  SharedLoggerModule,
+  SharedModules,
+} from '@app/shared-modules';
 import { ConfigModule } from '@nestjs/config';
-import { SERVICES } from '@app/shared-modules/common/models';
+import { QUEUES, SERVICES } from '@app/shared-modules/common/models';
 
 @Module({
   imports: [
@@ -22,8 +26,11 @@ import { SERVICES } from '@app/shared-modules/common/models';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    {
+      provide: LOGGER_SERVICE,
+      useClass: SharedLoggerModule,
+    },
     UserService,
-    MyLoggerService,
   ],
 })
 export class UsersModule {}
