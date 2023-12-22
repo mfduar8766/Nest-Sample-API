@@ -1,13 +1,13 @@
 import {
   ApplicationRoles,
-  LOGGER_SERVICE,
-  SharedModulesService,
+  RabbitMqService,
+  SERVICES,
   TMessagePayload,
   USER_EVENTS,
   UserModelDto,
 } from '@app/shared-modules';
 import { SharedLoggerService } from '@app/shared-modules/modules/logger/logger.service';
-import { Controller, Inject } from '@nestjs/common';
+import { Inject, Controller } from '@nestjs/common';
 import {
   Ctx,
   MessagePattern,
@@ -20,8 +20,8 @@ import { AppUsersService } from './app-users.service';
 export class AppUsersController {
   constructor(
     private readonly appUsersService: AppUsersService,
-    private readonly shareServices: SharedModulesService,
-    @Inject(LOGGER_SERVICE)
+    private readonly shareServices: RabbitMqService,
+    @Inject(SERVICES.LOGGER_SERVICE)
     private readonly logger: SharedLoggerService,
   ) {}
 

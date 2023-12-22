@@ -1,35 +1,37 @@
-import { QUEUES } from '@app/shared-modules';
-import { SharedLoggerService } from '@app/shared-modules/modules/logger/logger.service';
+import { QUEUES, RabbitMqService } from '@app/shared-modules';
+import { SharedLoggerService } from '@app/shared-modules';
 import { ShutdownSignal } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppUsersModule } from './app-users.module';
 
 (async () => {
   const logger = new SharedLoggerService('app-users');
   try {
-    const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-      AppUsersModule,
-      {
-        transport: Transport.RMQ,
-        options: {
-          urls: [`${process.env.RABBITMQ_URL}`],
-          queue: QUEUES.users_queue,
-          noAck: false,
-          queueOptions: {
-            durable: true,
-          },
-        },
-      },
-    );
+    const app = await NestFactory.create(AppUsersModule);
+    const rmqService = app.get(RabbitMqService);
+    app.connectMicroservice(rmqService.getOptions(QUEUES.USERS_QUEUE));
     app.enableShutdownHooks([ShutdownSignal.SIGINT, ShutdownSignal.SIGTERM]);
     app.useLogger(logger);
-    await app.listen();
+
+    app.setGlobalPrefix(`api/${process.env.API_VERSION}`);
+    app.enableCors({
+      origin: `http://localhost:3001`,
+      methods: ['GET'],
+      // allowedHeaders: process.env.ROLES.split(', ') || [
+      //   'USER, ADMIN, SUPER_USER',
+      // ],
+    });
+    await app.startAllMicroservices();
+    await app.listen(3001, () => {
+      logger.logInfo({
+        message: 'REST API listening on: http://localhost:3001',
+      });
+    });
     logger.logInfo({
       message: `Microservice: app-users getConnectionOptions(): is listening on: ${JSON.stringify(
         {
-          url: `${process.env.RABBITMQ_URL}`,
-          queues: ['users_queue'],
+          url: `${process.env.RABBITMQ_URI}`,
+          queues: [QUEUES.USERS_QUEUE],
         },
       )}`,
       method: 'app.listen()',

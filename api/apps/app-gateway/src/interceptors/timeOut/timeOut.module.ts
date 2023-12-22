@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TimeoutInterceptor } from './timeOut.interceptor';
-import { SharedLoggerModule } from '@app/shared-modules/modules/logger/loggger.module';
-import { LOGGER_SERVICE } from '@app/shared-modules';
+import { SERVICES, SharedLoggerService } from '@app/shared-modules';
 
 @Module({
   providers: [
     {
-      provide: LOGGER_SERVICE,
-      useClass: SharedLoggerModule,
+      provide: SERVICES.LOGGER_SERVICE,
+      useFactory: () => new SharedLoggerService(TimeOutModule.name),
     },
   ],
   exports: [TimeoutInterceptor],

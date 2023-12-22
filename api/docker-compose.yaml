@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   rabbitmq:
@@ -13,13 +13,13 @@ services:
     volumes:
       - /var/lib/rabbitmq
     env_file:
-      - rabbitmq-env.conf
+      - .env.development.local
     healthcheck:
       test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
       interval: 5s
       timeout: 10s
       retries: 5
-      start_period: 0s
+      start_period: 90s
     networks:
       - node-network
 
@@ -87,6 +87,16 @@ services:
       - /usr/src/app/node_modules
     restart: always
     working_dir: /usr/src/app
+    ports:
+      - 3001:3001
+    expose:
+      - 3001
+    # healthcheck:
+    #   test: ['CMD', 'curl', '-f', 'http://localhost:3001/api/v1/status/health']
+    #   interval: 10s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 0s
     depends_on:
       mongodb:
         condition: service_healthy
@@ -113,7 +123,7 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    restart: unless-stopped
+    restart: always
     working_dir: /usr/src/app
     depends_on:
       - app-users

@@ -4,11 +4,12 @@ import { AppUsersService } from './app-users.service';
 import { ConfigModule } from '@nestjs/config';
 import {
   ENV,
-  LOGGER_SERVICE,
-  SharedLoggerModule,
-  SharedModules,
+  RabbitMqModule,
+  SERVICES,
+  SharedLoggerService,
 } from '@app/shared-modules';
 import { MongooseModule } from '@nestjs/mongoose';
+import { HealthCheckModule } from './modules/health.module';
 
 @Module({
   imports: [
@@ -27,14 +28,15 @@ import { MongooseModule } from '@nestjs/mongoose';
         retryAttempts: 3,
       },
     ),
-    SharedModules,
+    RabbitMqModule,
+    HealthCheckModule,
   ],
   controllers: [AppUsersController],
   providers: [
     AppUsersService,
     {
-      provide: LOGGER_SERVICE,
-      useClass: SharedLoggerModule,
+      provide: SERVICES.LOGGER_SERVICE,
+      useFactory: () => new SharedLoggerService(AppUsersModule.name),
     },
   ],
 })

@@ -1,5 +1,5 @@
 import { ENV } from '@app/shared-modules';
-import { SharedLoggerService } from '@app/shared-modules/modules/logger/logger.service';
+import { SharedLoggerService } from '@app/shared-modules';
 import { ShutdownSignal } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common/enums';
 import { ConfigService } from '@nestjs/config';
@@ -11,6 +11,7 @@ import { HttpExceptionFilter } from './filters/http.exception.filter';
   const logger = new SharedLoggerService('app-gateway');
   try {
     const app = await NestFactory.create(AppModule);
+    app.useLogger(logger);
     const configService = app.get(ConfigService);
     const env = configService.get('NODE_ENV') || ENV.DEVELOPMENT;
     const host =
@@ -22,7 +23,6 @@ import { HttpExceptionFilter } from './filters/http.exception.filter';
     app.enableShutdownHooks([ShutdownSignal.SIGINT, ShutdownSignal.SIGTERM]);
     app.setGlobalPrefix(`api/${process.env.API_VERSION}`);
     app.useGlobalFilters(new HttpExceptionFilter());
-    app.useLogger(logger);
     app.enableCors({
       origin: `http://${env === ENV.DEVELOPMENT ? host : 'localhost'}:${
         env === ENV.DEVELOPMENT ? port : 3000
@@ -33,29 +33,36 @@ import { HttpExceptionFilter } from './filters/http.exception.filter';
       ],
     });
 
-    process.on('uncaughtException', function (err: any) {
-      logger.logWarn({
+    process.on('uncaughtException', function (error: any) {
+      logger.logFatal({
         message: `app-gateway uncaughtException ${HttpStatus.INTERNAL_SERVER_ERROR}`,
         fileName: 'main',
-        method: 'uncaughtExceptionHandler',
-        value: err,
+        method: 'uncaughtException()',
+        value: `${JSON.stringify({
+          message: error.message,
+          stack: error.stack,
+        })}`,
       });
     });
 
-    await app.listen(env === ENV.DEVELOPMENT ? port : 3000, () =>
+    await app.listen(env === ENV.DEVELOPMENT ? port : 3000, () => {
       logger.logInfo({
         message: `app-gateway listening on http://${
           env === ENV.DEVELOPMENT ? host : 'localhost'
         }:${env === ENV.DEVELOPMENT ? port : 3000}`,
         fileName: 'main',
-        method: 'bootStrap',
-      }),
-    );
+        method: 'app.listen()',
+      });
+    });
   } catch (error) {
     logger.logError({
-      message: `Error starting app-gateway: ${error}`,
+      message: `Error starting app-gateway:`,
+      value: `${JSON.stringify({
+        message: error.message,
+        stack: error.stack,
+      })}`,
       fileName: 'main',
-      method: 'bootStrap',
+      method: 'bootStrap()',
     });
   }
 })();
