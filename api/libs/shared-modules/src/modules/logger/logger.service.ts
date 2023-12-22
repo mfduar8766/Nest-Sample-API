@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
-type TLogLevels = 'log' | 'error' | 'warn' | 'debug';
+type TLogLevels = 'log' | 'error' | 'warn' | 'debug' | 'fatal';
 
 type TLoggerMessage = {
   source?: string;
@@ -19,6 +19,14 @@ type TLoggerMessage = {
 
 @Injectable()
 export class SharedLoggerService implements LoggerService {
+  constructor(serviceName: string) {
+    this._serviceName = serviceName;
+    this.loggerMessage = { ...this.loggerMessage, source: serviceName };
+    this.fileName = this.setFileName();
+    this.fullPath = this.setFullPath();
+    this.createLoggerDir();
+  }
+
   public set setLoggerFileName(name: string) {
     this.loggerMessage = { ...this.loggerMessage, fileName: name };
   }
@@ -29,27 +37,6 @@ export class SharedLoggerService implements LoggerService {
 
   public get serviceName(): string {
     return this._serviceName;
-  }
-
-  private date = new Date();
-  private loggerPath = `${__dirname.replace('/dist', '')}/Logs`;
-  private fileName = '';
-  private _serviceName = '';
-  private fullPath = '';
-  private loggerMessage: TLoggerMessage = {
-    source: this._serviceName,
-    level: 'log',
-    message: '',
-    fileName: '',
-    date: this.createLogDate(false),
-  };
-
-  constructor(serviceName: string) {
-    this._serviceName = serviceName;
-    this.loggerMessage = { ...this.loggerMessage, source: serviceName };
-    this.fileName = this.setFileName();
-    this.fullPath = this.setFullPath();
-    this.createLoggerDir();
   }
 
   public logInfo({ message, value, fileName, method }: TLoggerMessage) {
@@ -80,6 +67,16 @@ export class SharedLoggerService implements LoggerService {
     });
   }
 
+  public logFatal({ message, value, fileName, method }: TLoggerMessage) {
+    this.handleSetLogLevel({
+      message,
+      value,
+      fileName,
+      method,
+      level: 'fatal',
+    });
+  }
+
   log(message: TLoggerMessage) {
     console.log(`\x1b[32m ${JSON.stringify(message)}\x1b[0m`);
     this.appendToFile(message);
@@ -99,6 +96,24 @@ export class SharedLoggerService implements LoggerService {
     console.log(`\x1b[34m ${JSON.stringify(message)}\x1b[0m`);
     this.appendToFile(message);
   }
+
+  fatal?(message: TLoggerMessage) {
+    console.error(`\x1b[31m ${JSON.stringify(message)}\x1b[0m`);
+    this.appendToFile(message);
+  }
+
+  private date = new Date();
+  private loggerPath = `${__dirname.replace('/dist', '')}/Logs`;
+  private fileName = '';
+  private _serviceName = '';
+  private fullPath = '';
+  private loggerMessage: TLoggerMessage = {
+    source: this._serviceName,
+    level: 'log',
+    message: '',
+    fileName: '',
+    date: this.createLogDate(false),
+  };
 
   private createLogDate(addServiceName: boolean = true): string {
     return `${this.date.getFullYear()}:${this.setMonthPrefix()}:${this.date.getDate()}:${this.date.getHours()}:${this.date.getMinutes()}:${this.date.getSeconds()}:${this.date.getMilliseconds()}${

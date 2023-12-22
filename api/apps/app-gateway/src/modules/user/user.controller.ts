@@ -1,9 +1,8 @@
 import {
   ApplicationRoles,
-  LOGGER_SERVICE,
-  USER_SERVICE,
   UserModelDto,
   SharedLoggerService,
+  SERVICES,
 } from '@app/shared-modules';
 import {
   Body,
@@ -35,28 +34,49 @@ export class UserController
   implements OnApplicationBootstrap, OnApplicationShutdown
 {
   private _isConnected = false;
+  private _maxConnectAttempts = 10;
+  private _connectAttempts = 0;
 
   constructor(
     private readonly userService: UserService,
-    @Inject(LOGGER_SERVICE)
+    @Inject(SERVICES.LOGGER_SERVICE)
     private readonly sharedLoggerService: SharedLoggerService,
-    @Inject(USER_SERVICE) private readonly appUsersService: ClientProxy,
+    @Inject(SERVICES.USER_SERVICE)
+    private readonly appUsersService: ClientProxy,
   ) {
     this.sharedLoggerService.setLoggerFileName = UserController.name;
   }
 
   async onApplicationBootstrap() {
+    this.sharedLoggerService.logInfo({
+      message: 'onApplicationBootstrap() called',
+    });
+    await this.handleConnect();
+  }
+
+  async handleConnect() {
+    if (this._connectAttempts >= this._maxConnectAttempts) {
+      throw new Error('Connection tries exceeded cannot connect to broker...');
+    }
     try {
-      await this.appUsersService.connect();
-      this.sharedLoggerService.logInfo({
-        message: `Connected to RabbitMQ`,
-        method: 'onApplicationBootstrap',
-      });
-      this._isConnected = true;
+      if (this._connectAttempts === 0) {
+        await this.appUsersService.connect();
+        this.sharedLoggerService.logInfo({
+          message: `Connected to RabbitMQ`,
+          method: 'onApplicationBootstrap()',
+        });
+        this._isConnected = true;
+        this._connectAttempts = 0;
+      }
     } catch (error) {
       throw new Error(
         `Error connecting to app-users:${JSON.stringify(error)}...`,
       );
+    } finally {
+      if (!this._isConnected) {
+        this._connectAttempts++;
+        await this.handleConnect();
+      }
     }
   }
 

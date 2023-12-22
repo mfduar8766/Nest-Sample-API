@@ -4,12 +4,12 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import {
   APP_GUARD,
-  LOGGER_SERVICE,
-  SharedLoggerModule,
-  SharedModules,
+  RabbitMqModule,
+  QUEUES,
+  SERVICES,
+  SharedLoggerService,
 } from '@app/shared-modules';
 import { ConfigModule } from '@nestjs/config';
-import { QUEUES, SERVICES } from '@app/shared-modules/common/models';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { QUEUES, SERVICES } from '@app/shared-modules/common/models';
       isGlobal: true,
       cache: true,
     }),
-    SharedModules.registerServices(SERVICES.USER_SERVICE, QUEUES.users_queue),
+    RabbitMqModule.registerClient(SERVICES.USER_SERVICE, QUEUES.USERS_QUEUE),
   ],
   controllers: [UserController],
   providers: [
@@ -27,8 +27,8 @@ import { QUEUES, SERVICES } from '@app/shared-modules/common/models';
       useClass: RolesGuard,
     },
     {
-      provide: LOGGER_SERVICE,
-      useClass: SharedLoggerModule,
+      provide: SERVICES.LOGGER_SERVICE,
+      useFactory: () => new SharedLoggerService(UsersModule.name),
     },
     UserService,
   ],

@@ -1,20 +1,19 @@
 import {
-  LOGGER_SERVICE,
   MessagePayload,
   TMessagePayload,
   USER_EVENTS,
-  USER_SERVICE,
   UserModelDto,
+  SERVICES,
+  SharedLoggerService,
 } from '@app/shared-modules';
-import { SharedLoggerService } from '@app/shared-modules/modules/logger/logger.service';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class UserService {
   constructor(
-    @Inject(USER_SERVICE) private readonly usersService: ClientProxy,
-    @Inject(LOGGER_SERVICE)
+    @Inject(SERVICES.USER_SERVICE) private readonly usersService: ClientProxy,
+    @Inject(SERVICES.LOGGER_SERVICE)
     private readonly sharedLoggerService: SharedLoggerService,
   ) {
     this.sharedLoggerService.setLoggerFileName = UserService.name;

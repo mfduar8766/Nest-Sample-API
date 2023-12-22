@@ -22,7 +22,7 @@ case $feature in
     ;;
     d) #debug
     feature="DEBUG"
-     ;;
+    ;;
     r) #refactor
     feature="REFACTOR"
     ;;

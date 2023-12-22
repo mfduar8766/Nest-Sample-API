@@ -4,17 +4,15 @@ import {
   ApplicationRoles,
   ENV,
   TMessagePayload,
-  USER_SERVICE,
   TUsers,
   QUEUES,
-  LOGGER_SERVICE,
+  SERVICES,
 } from './models';
 import { USER_EVENTS } from './events';
 
 export {
   ApplicationRoles,
   APP_GUARD,
-  USER_SERVICE,
   ENV,
   TMessagePayload,
   TUsers,
@@ -22,5 +20,5 @@ export {
   UserModelDto,
   USER_EVENTS,
   QUEUES,
-  LOGGER_SERVICE,
+  SERVICES,
 };
