@@ -4,7 +4,7 @@ const http = require('http');
 const request = http.get(
   'http://localhost:3001/api/v1/status/health',
   (res) => {
-    console.log(`STATUS: ${res.statusCode}`);
+    console.log(`Received response of: ${res.statusCode}`);
     if (res.statusCode === 200) {
       process.exit(0);
     } else {
@@ -14,7 +14,7 @@ const request = http.get(
 );
 
 request.on('error', function (err) {
-  console.error('ERROR:', err);
+  console.error('Error getting response form app-users:', err);
   process.exit(1);
 });
 request.end();
