@@ -14,12 +14,10 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import { AppUsersService } from './app-users.service';
 
 @Controller()
 export class AppUsersController {
   constructor(
-    private readonly appUsersService: AppUsersService,
     private readonly shareServices: RabbitMqService,
     @Inject(SERVICES.LOGGER_SERVICE)
     private readonly logger: SharedLoggerService,

@@ -7,14 +7,14 @@ import {
   RabbitMqModule,
   QUEUES,
   SERVICES,
-  SharedLoggerService,
+  SharedLoggerModule,
 } from '@app/shared-modules';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['./.env.development.local', './rabbitmq-env.conf'],
+      envFilePath: ['./.env.development.local'],
       isGlobal: true,
       cache: true,
     }),
@@ -26,10 +26,7 @@ import { ConfigModule } from '@nestjs/config';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    {
-      provide: SERVICES.LOGGER_SERVICE,
-      useFactory: () => new SharedLoggerService(UsersModule.name),
-    },
+    SharedLoggerModule.createLoggerProvider(),
     UserService,
   ],
 })

@@ -12,14 +12,10 @@ import { AppUsersModule } from './app-users.module';
     app.connectMicroservice(rmqService.getOptions(QUEUES.USERS_QUEUE));
     app.enableShutdownHooks([ShutdownSignal.SIGINT, ShutdownSignal.SIGTERM]);
     app.useLogger(logger);
-
     app.setGlobalPrefix(`api/${process.env.API_VERSION}`);
     app.enableCors({
       origin: `http://localhost:3001`,
       methods: ['GET'],
-      // allowedHeaders: process.env.ROLES.split(', ') || [
-      //   'USER, ADMIN, SUPER_USER',
-      // ],
     });
     await app.startAllMicroservices();
     await app.listen(3001, () => {

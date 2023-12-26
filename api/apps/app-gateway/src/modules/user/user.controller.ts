@@ -28,24 +28,28 @@ import { Roles } from '../../decorators/applicationRoles.decorators';
 import { HttpExceptionFilter } from '../../filters/http.exception.filter';
 import { TimeoutInterceptor } from '../../interceptors/timeOut/timeOut.interceptor';
 import { UserService } from './user.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('users')
 export class UserController
   implements OnApplicationBootstrap, OnApplicationShutdown
 {
-  private _isConnected = false;
-  private _maxConnectAttempts = 10;
-  private _connectAttempts = 0;
-
   constructor(
     private readonly userService: UserService,
     @Inject(SERVICES.LOGGER_SERVICE)
     private readonly sharedLoggerService: SharedLoggerService,
     @Inject(SERVICES.USER_SERVICE)
     private readonly appUsersService: ClientProxy,
+    private readonly configService: ConfigService,
   ) {
     this.sharedLoggerService.setLoggerFileName = UserController.name;
   }
+
+  private _isConnected = false;
+  private _maxConnectAttempts = this.configService.get<number>(
+    'MAX_BROKER_CONNECT_RETRIES',
+  );
+  private _connectAttempts = 0;
 
   async onApplicationBootstrap() {
     this.sharedLoggerService.logInfo({
@@ -56,6 +60,7 @@ export class UserController
 
   async handleConnect() {
     if (this._connectAttempts >= this._maxConnectAttempts) {
+      this.appUsersService.close();
       throw new Error('Connection tries exceeded cannot connect to broker...');
     }
     try {

@@ -1,6 +1,6 @@
 import { ENV } from '@app/shared-modules';
 import { SharedLoggerService } from '@app/shared-modules';
-import { ShutdownSignal } from '@nestjs/common';
+import { INestApplication, ShutdownSignal } from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common/enums';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -9,8 +9,9 @@ import { HttpExceptionFilter } from './filters/http.exception.filter';
 
 (async () => {
   const logger = new SharedLoggerService('app-gateway');
+  let app: INestApplication<any>;
   try {
-    const app = await NestFactory.create(AppModule);
+    app = await NestFactory.create(AppModule);
     app.useLogger(logger);
     const configService = app.get(ConfigService);
     const env = configService.get('NODE_ENV') || ENV.DEVELOPMENT;
@@ -64,5 +65,12 @@ import { HttpExceptionFilter } from './filters/http.exception.filter';
       fileName: 'main',
       method: 'bootStrap()',
     });
+    if (
+      error.message.includes(
+        'Connection tries exceeded cannot connect to broker...',
+      )
+    ) {
+      await app.close();
+    }
   }
 })();
