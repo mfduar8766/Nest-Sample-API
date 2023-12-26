@@ -1,9 +1,17 @@
-import { Global, Module } from '@nestjs/common';
+import { Module, Provider, Scope } from '@nestjs/common';
 import { SharedLoggerService } from './logger.service';
+import { SERVICES } from '@app/shared-modules/common';
 
-@Global()
 @Module({
   providers: [SharedLoggerService],
   exports: [SharedLoggerService],
 })
-export class SharedLoggerModule {}
+export class SharedLoggerModule {
+  static createLoggerProvider(): Provider {
+    return {
+      provide: SERVICES.LOGGER_SERVICE,
+      useFactory: () => new SharedLoggerService(),
+      scope: Scope.TRANSIENT,
+    };
+  }
+}

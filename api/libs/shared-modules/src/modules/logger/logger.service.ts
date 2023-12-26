@@ -19,7 +19,7 @@ type TLoggerMessage = {
 
 @Injectable()
 export class SharedLoggerService implements LoggerService {
-  constructor(serviceName: string) {
+  constructor(serviceName?: string) {
     this._serviceName = serviceName;
     this.loggerMessage = { ...this.loggerMessage, source: serviceName };
     this.fileName = this.setFileName();

@@ -1,5 +1,0 @@
-export feature
-#!/bin/bash 
-
-
-    
