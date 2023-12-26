@@ -58,33 +58,6 @@ export class UserController
     await this.handleConnect();
   }
 
-  async handleConnect() {
-    if (this._connectAttempts >= this._maxConnectAttempts) {
-      this.appUsersService.close();
-      throw new Error('Connection tries exceeded cannot connect to broker...');
-    }
-    try {
-      if (this._connectAttempts === 0) {
-        await this.appUsersService.connect();
-        this.sharedLoggerService.logInfo({
-          message: `Connected to RabbitMQ`,
-          method: 'onApplicationBootstrap()',
-        });
-        this._isConnected = true;
-        this._connectAttempts = 0;
-      }
-    } catch (error) {
-      throw new Error(
-        `Error connecting to app-users:${JSON.stringify(error)}...`,
-      );
-    } finally {
-      if (!this._isConnected) {
-        this._connectAttempts++;
-        await this.handleConnect();
-      }
-    }
-  }
-
   onApplicationShutdown(signal?: string) {
     if (signal === ShutdownSignal.SIGTERM || signal === ShutdownSignal.SIGINT) {
       if (this._isConnected) {
@@ -240,6 +213,33 @@ export class UserController
         method: 'deleteUser()',
         value: error,
       });
+    }
+  }
+
+  private async handleConnect() {
+    if (this._connectAttempts >= this._maxConnectAttempts) {
+      this.appUsersService.close();
+      throw new Error('Connection tries exceeded cannot connect to broker...');
+    }
+    try {
+      if (this._connectAttempts === 0) {
+        await this.appUsersService.connect();
+        this.sharedLoggerService.logInfo({
+          message: `Connected to RabbitMQ`,
+          method: 'onApplicationBootstrap()',
+        });
+        this._isConnected = true;
+        this._connectAttempts = 0;
+      }
+    } catch (error) {
+      throw new Error(
+        `Error connecting to app-users:${JSON.stringify(error)}...`,
+      );
+    } finally {
+      if (!this._isConnected) {
+        this._connectAttempts++;
+        await this.handleConnect();
+      }
     }
   }
 }

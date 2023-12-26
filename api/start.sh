@@ -25,5 +25,5 @@ if [ $yn = y ]; then
   COMPOSE_HTTP_TIMEOUT=500 docker-compose up --build -V &
 else
   echo "Running docker-compose.yaml file and starting services..." &
-  COMPOSE_HTTP_TIMEOUT=500 docker-compose up &
+  COMPOSE_HTTP_TIMEOUT=500 docker-compose up && docker-compose rm -f mongo-seed &
 fi

@@ -61,6 +61,7 @@ services:
   #     - node-network
 
   mongo-seed:
+    container_name: mongo-seed
     build:
       context: ./mongo-seed
       dockerfile: ./Dockerfile
@@ -91,7 +92,7 @@ services:
     expose:
       - 3001
     healthcheck:
-      test: ['CMD', 'node', './healthCheck/app-users.healthCheck.js']
+      test: ['CMD', 'node', './healthCheck/index.js', 'app-users']
       interval: 10s
       timeout: 10s
       retries: 5
