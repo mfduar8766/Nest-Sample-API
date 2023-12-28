@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApplicationRoles } from '../common/models/applicationRoles';
+import bcrypt from 'bcrypt';
 
 export type UsersDocument = Users & Document;
 
@@ -41,3 +42,16 @@ export class Users {
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);
+
+UsersSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.schema. = await bcrypt.hash(this.password, salt);
+});
+
+UsersSchema.methods.comparePassword = async function (enteredPassword: string){
+  return await bcrypt.compare(enteredPassword, this.pa)
+}

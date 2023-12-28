@@ -1,0 +1,166 @@
+openapi: 3.0.3
+info: 
+  title: Aplication Contents API
+  description: defines all data points for given microservice
+  version: 1.0.0
+  x-system.scopes: [ "warehouse:read, warehouse:write"]
+servers:
+  - url: "http://localhost:8080/{module}/{version}"
+    description: executes locally
+    variables:
+      module: 
+        enum: [app-warehouse-clients, app-warehouse-consumers, app-warehouse-suppliers, app-warehouse-stock]
+        default: app-warehouse-microservice
+      version:
+        default: 1.0.0
+  - url: "https://{mock}-{env}/{module}/{version}"
+    description: (DEV, INT, QA, PROD) internal environments
+    variables:
+      module: 
+        enum: [app-warehouse-microservice]
+        default: app-warehouse-microservice
+      version:
+        default: 1.0.0
+      mock: 
+        enum: [mock-api]
+        default: mock-api
+      env: 
+        enum: [dev, int, qa, prod]
+        default: int
+
+paths:
+  '/clients':
+    get:
+      tags:
+        - "Clients List"
+      summary: "Retrieves a list of clients of the warehouse"
+      description: |
+        This operation returns a list of clients of the warehouse
+        |Http Status | Severity | StatusCode      |
+        |404         |info      | No Records Found|
+      x-system.scope: [ "warehouse:read"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/clients_getallclients_REQUEST"
+      responses:
+        '200':
+            $ref: "#/components/responses/HTTP_200"
+        '201':
+            $ref: "#/components/responses/HTTP_201"
+  '/clients/addnewclient':
+    post:
+      tags:
+        - "Post New Client"
+      summary: "Creates a new Client record in the warehouse system"
+      description: |
+        This operation returns a list of clients of the warehouse
+        |Http Status | Severity | StatusCode      |
+        |404         |info      | No Records Found|
+      x-system.scope: [ "warehouse:write"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/clients_postnewclient"
+      responses:
+        '200':
+            $ref: "#/components/responses/HTTP_200"
+        '201':
+            $ref: "#/components/responses/HTTP_201" 
+
+components:
+  responses:
+    HTTP_200:
+      description: OK - The Operation was Successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response"
+    HTTP_201:
+      description: OK - The Operation was Successful
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response"
+
+# ########################### END OF HTTP STATUS RESPONSES ###########################
+
+  schemas:
+    clients_getallclients_REQUEST:
+      description: fetches a list of all registered clients
+      required:
+        - payload
+        - metadata
+        - request
+      type: object
+      properties:
+        payload:
+          type: object
+          properties:
+            payload:
+              $ref: "#/components/schemas/payload"
+            metadata:
+              $ref: "#/components/schemas/metadata"
+
+    clients_postnewclient:
+      description: fetches a list of all registered clients
+      required:
+        - payload
+        - metadata
+        - request
+      type: object
+      properties:
+        payload:
+          type: object
+          properties:
+            payload:
+              $ref: "#/components/schemas/payload"
+            metadata:
+              $ref: "#/components/schemas/metadata"
+
+    clients_getallclients_RESPONSE:
+      type: object
+      description: respose for request to get all clients
+      required:
+        - warehouseId
+      properties:
+        warehouseID:
+          $ref: "#/components/schemas/warehouseID"
+
+################################## END OF ENDPOINTS ############################
+
+    warehouseID:  
+      type: string  
+      minLength: 16
+      maxLength: 32
+      description: "An Unique, generated key that identifies a warehouse in the system"
+      example: WRHSE-22334KSA21
+    payload:  
+      type: object  
+      description: "An Unique, generated key that identifies a warehouse in the system"
+      properties:
+            request:
+              $ref: "#/components/schemas/request"
+      
+    metadata:  
+      type: string  
+      minLength: 16
+      maxLength: 32
+      description: "An Unique, generated key that identifies a warehouse in the system"
+      example: metadata information will be in this field
+   
+    request:  
+      type: array  
+      items: 
+        type: object
+        properties:
+          warehouseID:
+            $ref: "#/components/schemas/warehouseID"
+          
+    Response: 
+      type: object
+      properties:
+        payload:
+          $ref: "#/components/schemas/payload"

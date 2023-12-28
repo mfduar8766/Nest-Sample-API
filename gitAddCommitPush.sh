@@ -40,10 +40,16 @@ git checkout -b "$feature/$current"
 echo "You sure you wanna push? (y/n)"
 read -i "y" -e yn
 
+
 if [ "$yn" = y ]; then
   git push origin "$branch"
 else
   echo "Have a nice day!"
 fi
+
+echo "what is your new branch name?"
+read branchName
+
+git checkout -b $branchName
 }
 addcommitpush $1

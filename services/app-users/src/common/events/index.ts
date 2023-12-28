@@ -1,4 +1,4 @@
-import { TUserMessagePayloadParams } from "../models/message-payload.types";
+import { TUserMessagePayloadParams } from '../models/message-payload.types';
 
 export type TMessagePayload = {
   event: string;
@@ -15,6 +15,8 @@ export enum USER_EVENTS {
   delete_user = 'delete_user',
   bulk_insert = 'bulk_insert',
   bulk_delete = 'bulk_delete',
+  login = 'login',
+  message = 'message',
 }
 
 export type TUSER_EVENTS =
@@ -24,4 +26,6 @@ export type TUSER_EVENTS =
   | 'update_user'
   | 'delete_user'
   | 'bulk_insert'
-  | 'bulk_delete';
+  | 'bulk_delete'
+  | 'login'
+  | 'message';

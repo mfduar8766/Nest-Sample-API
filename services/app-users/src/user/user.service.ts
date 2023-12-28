@@ -9,12 +9,10 @@ import {
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 import { MessagePayload } from '../common/dto/MessagePayload.dto';
-import {
-  TMessagePayload,
-  TUSER_EVENTS,
-  USER_EVENTS,
-} from '../common/events';
+import { TMessagePayload, TUSER_EVENTS, USER_EVENTS } from '../common/events';
 import { Users, UsersDocument } from '../schemas/users.schema';
+import { encryptData, decryptData } from 'src/utils/encrypt';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -104,21 +102,30 @@ export class UserService {
   async createUser(payload: TMessagePayload): Promise<TMessagePayload> {
     console.log(`${this._name} createUser()`);
     if (payload.params?.user) {
-      try {
-        const createdUser = await (
-          await this.userModel.create(payload.params.user)
-        ).save();
-        this.createResponseObject('add_user');
-        this._responsePayload.response = { ...createdUser };
-        return this._responsePayload;
-      } catch (error) {
-        throw new HttpException(
-          {
-            message: `Cannot create user: ${payload.params?.user}.`,
-            error,
-          },
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
+      // Shouldnt we check if the user already exists in the system? -- Create test unit for this scenario
+      if (!this.getUser(payload)) {
+        try {
+          const salt = await bcrypt.genSalt();
+          const hashPassword = await bcrypt.hash(
+            payload.params?.user.password,
+            salt,
+          );
+          payload.params.user.password = hashPassword;
+          const createdUser = await (
+            await this.userModel.create(payload.params.user)
+          ).save();
+          this.createResponseObject('add_user');
+          this._responsePayload.response = { ...createdUser };
+          return this._responsePayload;
+        } catch (error) {
+          throw new HttpException(
+            {
+              message: `Cannot create user: ${payload.params?.user}.`,
+              error,
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
       }
     }
     throw new HttpException(
@@ -187,6 +194,29 @@ export class UserService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async loginUser(payload: TMessagePayload): Promise<string> {
+    const user = await this.getUser(payload);
+
+    if (user) {
+      const match = await bcrypt.compare(
+        payload.params.user.password,
+        user.params.user.password,
+      );
+      if (match) return 'Valid Credentials';
+      return 'Invalid Credentials';
+    }
+    return 'Invalid Invalid';
+  }
+
+  async sendMessage(message: string): Promise<object> {
+    const encryptedMessage = encryptData(message);
+    const decryptedMessage = decryptData(encryptedMessage);
+    return {
+      'Encrypted Message': encryptedMessage.toString(),
+      'Decrypted Message': decryptedMessage.toString(),
+    };
   }
 
   handleChangePassword(payload: TMessagePayload): boolean {

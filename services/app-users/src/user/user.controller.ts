@@ -50,4 +50,16 @@ export class UserController {
     console.log(`${this._name} handleBulkDelete Payload`, payload);
     return this.userService.handleBulkDelete(payload);
   }
+  @MessagePattern(USER_EVENTS.login)
+  async getMessage(payload: TMessagePayload) {
+    console.log(`${this._name} login payload`, payload);
+    return this.userService.loginUser(payload);
+  }
+
+  //In case there is a need to end-to-end encrypted message
+  @MessagePattern(USER_EVENTS.message)
+  async sendMessage(payload: TMessagePayload) {
+    console.log(`${this._name} message payload`, payload);
+    return this.userService.sendMessage('Modify to send some message');
+  }
 }
