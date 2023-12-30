@@ -1,7 +1,8 @@
+import { Schema } from 'mongoose';
 import { ApplicationRoles } from './applicationRoles';
 
 export type TUsers = {
-  _id?: string;
+  _id?: Schema.Types.ObjectId;
   userName: string;
   firstName: string;
   lastName: string;
