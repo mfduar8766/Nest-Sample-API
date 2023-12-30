@@ -131,4 +131,10 @@ export class MongoDbUsersService {
       );
     }
   }
+
+  async startTransaction() {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    return session;
+  }
 }
