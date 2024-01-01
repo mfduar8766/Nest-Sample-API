@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { fs } = require('fs');
+const fs = require('fs');
 
 const removeFile = (path) => {
   try {
@@ -10,7 +10,7 @@ const removeFile = (path) => {
 };
 
 (async () => {
-  const dbFile = 'mongo-seed/initDb.json';
+  const dbFile = 'initDb.json';
   const dbUsers = JSON.stringify(
     [
       {
@@ -48,7 +48,7 @@ const removeFile = (path) => {
     fs.writeFileSync(dbFile, dbUsers);
   } catch (error) {
     console.error(
-      'Create DBName: sample with collection: users error: ',
+      'Create DBName: travel with collection: users error: ',
       error,
     );
   }

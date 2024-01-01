@@ -1,9 +1,12 @@
-import { TUserMessagePayloadParams } from '../models/message-payload.types';
+import {
+  TResponsePayloadParams,
+  TUserMessagePayloadParams,
+} from '../models/message-payload.types';
 
 export type TMessagePayload = {
-  event: string;
+  event: TUSER_EVENTS;
   params?: TUserMessagePayloadParams;
-  response?: Record<string, any>;
+  response?: TResponsePayloadParams;
   error?: any;
 };
 

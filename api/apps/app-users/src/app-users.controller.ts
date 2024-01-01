@@ -1,10 +1,8 @@
 import {
-  ApplicationRoles,
   RabbitMqService,
   SERVICES,
   TMessagePayload,
   USER_EVENTS,
-  UserModelDto,
 } from '@app/shared-modules';
 import { SharedLoggerService } from '@app/shared-modules/modules/logger/logger.service';
 import { Inject, Controller } from '@nestjs/common';
@@ -14,6 +12,8 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { AppUsersService } from './app-users.service';
+import { createMessagePayload } from '@app/shared-modules/utils';
 
 @Controller()
 export class AppUsersController {
@@ -21,6 +21,7 @@ export class AppUsersController {
     private readonly shareServices: RabbitMqService,
     @Inject(SERVICES.LOGGER_SERVICE)
     private readonly logger: SharedLoggerService,
+    private readonly userService: AppUsersService,
   ) {}
 
   @MessagePattern(USER_EVENTS.get_users)
@@ -34,19 +35,17 @@ export class AppUsersController {
       value: payload,
     });
     this.shareServices.handleContextAcknowledgement(context);
-    return [
-      new UserModelDto(
-        'bob22',
-        'bob',
-        'doe',
-        'bob@gmail.com',
-        '123',
-        23,
-        [ApplicationRoles.SUPER_USER],
-        new Date(Date.now()),
-        null,
-        '',
-      ),
-    ];
+    try {
+      const users = await this.userService.getUsers();
+      return createMessagePayload(payload.event, undefined, {
+        result: 'success',
+        data: users,
+      });
+    } catch (error) {
+      this.logger.logError({
+        message: 'Error getting users',
+        value: `${error}`,
+      });
+    }
   }
 }

@@ -18,9 +18,3 @@ export type TResponsePayloadParams = {
   result: TResponsePayloadResult;
   data: Record<string, any>;
 };
-
-export type TMessagePayload = {
-  event: string;
-  params?: TUserMessagePayloadParams;
-  response?: TResponsePayloadParams;
-};

@@ -1,3 +1,4 @@
+import { Schema } from 'mongoose';
 import { ApplicationRoles } from '../models/applicationRoles';
 import { TUsers } from '../models/users.types';
 
@@ -13,6 +14,6 @@ export class UserModelDto implements TUsers {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly activationCode: string,
-    public readonly _id?: string,
+    public readonly _id?: Schema.Types.ObjectId,
   ) {}
 }
